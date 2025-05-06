@@ -560,13 +560,77 @@ def delete_item():
     flash(f"Error: '{item_path}' not found or is not a file/directory.", "error")
 
     # If there was an error, redirect back to the form, preserving context
-    return redirect(url_for('delete_item', current_context_path=current_context_path))
+def rename_item():
+    """
+    API endpoint to rename a file or directory.
+    """
+    data = request.get_json()
+    old_path = data.get('oldPath', '')
+    new_name = data.get('newName', '')
 
-    # For GET request, render the form template.
-    return render_template('delete_item.html', current_context_path=current_context_path)
+    if not old_path or not new_name:
+        return jsonify({
+            'success': False,
+            'message': 'Path and new name are required'
+        })
+
+    # Obtener el directorio padre del archivo/directorio
+    parent_dir = os.path.dirname(old_path)
+    
+    # Construir la nueva ruta completa
+    new_path = os.path.join(parent_dir, new_name)
+
+    # Validar las rutas
+    full_old_path = get_full_path(old_path)
+    full_new_path = get_full_path(new_path)
+
+    if not full_old_path:
+        return jsonify({
+            'success': False,
+            'message': 'Invalid original path'
+        })
+
+    if not full_new_path:
+        return jsonify({
+            'success': False,
+            'message': 'Invalid new path'
+        })
+
+    try:
+        # Verificar si el archivo/directorio original existe
+        if not os.path.exists(full_old_path):
+            return jsonify({
+                'success': False,
+                'message': 'Original item not found'
+            })
+
+        # Verificar si el nuevo nombre ya existe
+        if os.path.exists(full_new_path):
+            return jsonify({
+                'success': False,
+                'message': 'An item with this name already exists'
+            })
+
+        # Realizar el renombrado
+        os.rename(full_old_path, full_new_path)
+
+        return jsonify({
+            'success': True,
+            'message': 'Item renamed successfully'
+        })
+    except OSError as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error renaming item: {str(e)}'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'An unexpected error occurred: {str(e)}'
+        })
 
 @app.route('/rename_item', methods=['GET', 'POST'])
-def rename_item():
+def rename_item_view():
     """
     Handle renaming a file or directory.
     GET: Display the form with the current item path.
@@ -587,7 +651,7 @@ def rename_item():
         if not original_path or not new_name:
             flash("Original path and new name cannot be empty.", "error")
             # Redirect back to the rename form with original path and context
-            return redirect(url_for('rename_item', item_path=original_path, current_context_path=current_context_path))
+            return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
         # Construct the full original path and validate it
         full_original_path = get_full_path(original_path)
@@ -613,14 +677,14 @@ def rename_item():
         if full_new_path is None:
              flash("Invalid new name provided.", "error")
              # Redirect back to the rename form with original path and context
-             return redirect(url_for('rename_item', item_path=original_path, current_context_path=current_context_path))
+             return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
 
         # Prevent renaming if the new path already exists
         if os.path.exists(full_new_path):
             flash(f"Error: An item named '{new_relative_path}' already exists.", "error")
             # Redirect back to the rename form with original path and context
-            return redirect(url_for('rename_item', item_path=original_path, current_context_path=current_context_path))
+            return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
 
         try:
@@ -635,7 +699,7 @@ def rename_item():
              flash(f"An unexpected error occurred: {e}", "error")
 
         # If there was an error, redirect back to the rename form
-        return redirect(url_for('rename_item', item_path=original_path, current_context_path=current_context_path))
+        return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
 
     # For GET request, render the form template.

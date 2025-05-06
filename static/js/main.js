@@ -394,33 +394,36 @@ document.getElementById('deleteItemForm').addEventListener('submit', async (e) =
 
 document.getElementById('renameItemForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const oldPath = document.getElementById('renameItemPath').value || '';
-    const formattedOldPath = oldPath ? oldPath.replace(/^\/|\/$/g, '') : '';
+    const oldPath = document.getElementById('renameItemPath').value;
     const newName = document.getElementById('renameItemName').value;
-    const oldName = oldPath.split('/').pop();
     
+    if (!oldPath || !newName) {
+        showAlert('danger', 'Por favor, ingrese una ruta y un nuevo nombre');
+        return;
+    }
+
     try {
         const response = await fetch('/api/rename_item', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ oldPath: formattedOldPath, newName }),
+            body: JSON.stringify({ oldPath, newName }),
         });
         const data = await response.json();
         
         if (data.success) {
             const modal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
             modal.hide();
-            const parentPath = formattedOldPath.split('/').slice(0, -1).join('/');
+            const parentPath = oldPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath);
-            showAlert('success', `"${oldName}" renombrado a "${newName}" correctamente`);
+            showAlert('success', 'Renombrado correctamente');
         } else {
-            showAlert('danger', data.message || 'Error al renombrar el item');
+            showAlert('danger', data.message || 'Error al renombrar');
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('danger', 'Error al renombrar el item');
+        showAlert('danger', 'Error al renombrar');
     }
 });
 
