@@ -148,12 +148,19 @@ function setModalPath(modalId, path, currentName = '') {
 }
 
 // Función para buscar archivos
+let searchTimeout;
+
 async function searchFiles() {
     const searchTerm = document.getElementById('searchInput').value.trim();
     const currentPath = document.getElementById('currentPath').textContent.replace('data/', '');
     
+    // Limpiar el timeout anterior si existe
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+    
+    // Si el término de búsqueda está vacío, volver a mostrar el contenido normal
     if (searchTerm.length === 0) {
-        // Si el término de búsqueda está vacío, volver a mostrar el contenido normal
         loadDirectoryContent(currentPath);
         return;
     }
@@ -165,21 +172,24 @@ async function searchFiles() {
     const browserContent = document.getElementById('browser-content');
     browserContent.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Buscando...</span></div></div>';
 
-    try {
-        const response = await fetch(`/api/search?term=${encodeURIComponent(searchTerm)}&path=${encodeURIComponent(currentPath)}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            displaySearchResults(data.results, searchTerm);
-        } else {
-            showAlert('danger', data.message || 'Error en la búsqueda');
-            loadDirectoryContent(currentPath);
+    // Agregar un delay de 300ms para evitar búsquedas innecesarias
+    searchTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/api/search?term=${encodeURIComponent(searchTerm)}&path=${encodeURIComponent(formattedPath)}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                displaySearchResults(data.results, searchTerm);
+            } else {
+                showAlert('danger', data.message || 'Error en la búsqueda');
+                loadDirectoryContent(formattedPath);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('danger', 'Error al realizar la búsqueda');
+            loadDirectoryContent(formattedPath);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al realizar la búsqueda');
-        loadDirectoryContent(currentPath);
-    }
+    }, 300);
 }
 
 // Función para mostrar los resultados de búsqueda

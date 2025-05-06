@@ -465,12 +465,18 @@ def append_file():
     """
     data = request.get_json()
     path = data.get('path', '')
-    content = data.get('content', '')
+    content = data.get('content', '').strip()  # Eliminar espacios en blanco al inicio y final
 
     if not path:
         return jsonify({
             'success': False,
             'message': 'Path is required'
+        })
+
+    if not content:
+        return jsonify({
+            'success': False,
+            'message': 'Content cannot be empty'
         })
 
     full_path = get_full_path(path)
@@ -481,8 +487,16 @@ def append_file():
         })
 
     try:
-        with open(full_path, 'a') as f:
-            f.write('\n' + content)
+        # Verificar si el archivo existe y tiene contenido
+        if os.path.exists(full_path) and os.path.getsize(full_path) > 0:
+            # Si el archivo tiene contenido, agregar una nueva línea antes del contenido nuevo
+            with open(full_path, 'a') as f:
+                f.write('\n' + content)
+        else:
+            # Si el archivo está vacío, escribir el contenido directamente
+            with open(full_path, 'w') as f:
+                f.write(content)
+
         return jsonify({
             'success': True,
             'message': 'Content appended successfully'
@@ -656,7 +670,7 @@ def search_files():
     if not search_term:
         return jsonify({
             'success': False,
-            'message': 'Search term is required'
+            'message': 'Por favor, ingrese un término de búsqueda'
         })
 
     full_current_path = get_full_path(current_path)
@@ -664,7 +678,13 @@ def search_files():
     if not full_current_path:
         return jsonify({
             'success': False,
-            'message': 'Invalid path'
+            'message': 'Ruta no válida. Por favor, verifique la ruta actual'
+        })
+
+    if not os.path.exists(full_current_path):
+        return jsonify({
+            'success': False,
+            'message': 'El directorio especificado no existe'
         })
 
     try:
@@ -701,10 +721,11 @@ def search_files():
         return jsonify({
             'success': True,
             'results': matches,
+            'message': f'Se encontraron {len(matches)} resultados',
             'search_term': search_term
         })
     except Exception as e:
         return jsonify({
             'success': False,
-            'message': str(e)
+            'message': f'Error al realizar la búsqueda: {str(e)}'
         })
