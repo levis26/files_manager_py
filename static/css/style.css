@@ -1,0 +1,67 @@
+/* Estilos generales */
+body {
+    background-color: #f8f9fa;
+}
+
+.container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.5rem 0;
+}
+
+.breadcrumb-item {
+    color: #6c757d;
+}
+
+.breadcrumb-item.active {
+    color: #007bff;
+    font-weight: 500;
+}
+
+/* Estilos para los iconos */
+.bi {
+    margin-right: 0.5rem;
+}
+
+/* Estilos para los enlaces */
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Estilos para el explorador */
+#browser-content {
+    min-height: 300px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+/* Estilos para los mensajes flash */
+.alert {
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
