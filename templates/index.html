@@ -14,7 +14,8 @@
                         <span class="input-group-text">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar archivos..." oninput="searchFiles()">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar archivos..." 
+           oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(searchFiles, 300)">
                     </div>
                 </div>
             </div>

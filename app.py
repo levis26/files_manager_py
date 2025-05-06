@@ -25,25 +25,32 @@ def get_full_path(user_path):
     directory traversal vulnerabilities.
     Returns the absolute path if valid, otherwise returns None.
     """
-    # If no path is provided, return the data directory itself
-    if not user_path:
-        return os.path.abspath(DATA_DIR)
-
-    # Normalize the path to remove any '../' attempts
-    normalized_path = os.path.normpath(user_path)
-    
-    # Join with DATA_DIR to get full path
-    full_path = os.path.join(DATA_DIR, normalized_path)
-    
-    # Check if the resulting path is still within DATA_DIR
     try:
-        # Get the absolute path of the data directory
+        # Si no se proporciona una ruta, devolver el directorio de datos
+        if not user_path:
+            return os.path.abspath(DATA_DIR)
+
+        # Normalizar la ruta y eliminar caracteres no deseados
+        normalized_path = os.path.normpath(user_path).strip('/')
+        
+        # Unir con DATA_DIR para obtener la ruta completa
+        full_path = os.path.join(DATA_DIR, normalized_path)
+        
+        # Obtener la ruta absoluta del directorio de datos
         data_dir_abs = os.path.abspath(DATA_DIR)
-        # Get the absolute path of the requested path
+        
+        # Obtener la ruta absoluta de la ruta solicitada
         requested_abs = os.path.abspath(full_path)
         
-        # Check if the requested path is within the data directory
+        # Verificar si la ruta solicitada está dentro del directorio de datos
         if os.path.commonpath([data_dir_abs, requested_abs]) != data_dir_abs:
+            return None
+            
+        # Si la ruta no existe y estamos creando un nuevo directorio o archivo, permitirlo
+        if not os.path.exists(requested_abs):
+            parent_dir = os.path.dirname(requested_abs)
+            if os.path.exists(parent_dir):
+                return requested_abs
             return None
             
         return requested_abs
@@ -83,23 +90,24 @@ def browse_directory():
     current_path = request.args.get('path', '')
     full_current_path = get_full_path(current_path)
     
-    if not os.path.exists(full_current_path):
+    if not full_current_path:
         return jsonify({
             'success': False,
             'message': 'Invalid path'
-        })
-
-    if not os.path.isdir(full_current_path):
-        return jsonify({
-            'success': False,
-            'message': 'Path is not a directory'
         })
 
     try:
         items = []
         for item in os.listdir(full_current_path):
             item_path = os.path.join(full_current_path, item)
+            
+            # Get the relative path from DATA_DIR
             relative_path = os.path.relpath(item_path, DATA_DIR)
+            
+            # Ensure the relative path starts with a slash
+            if not relative_path.startswith('/'):
+                relative_path = '/' + relative_path
+            
             items.append({
                 'name': item,
                 'path': relative_path,
@@ -637,3 +645,66 @@ if __name__ == '__main__':
     # debug=True enables auto-reloading and detailed error pages.
     # Set to False in a production environment.
     app.run(debug=True)
+
+
+# Añadir esta nueva ruta para manejar búsquedas
+@app.route('/api/search', methods=['GET'])
+def search_files():
+    search_term = request.args.get('term', '').lower()
+    current_path = request.args.get('path', '')
+    
+    if not search_term:
+        return jsonify({
+            'success': False,
+            'message': 'Search term is required'
+        })
+
+    full_current_path = get_full_path(current_path)
+    
+    if not full_current_path:
+        return jsonify({
+            'success': False,
+            'message': 'Invalid path'
+        })
+
+    try:
+        matches = []
+        # Recursively search through directories
+        for root, dirs, files in os.walk(full_current_path):
+            # Search in directory names
+            for dir_name in dirs:
+                if search_term in dir_name.lower():
+                    dir_path = os.path.join(root, dir_name)
+                    relative_path = os.path.relpath(dir_path, DATA_DIR)
+                    matches.append({
+                        'name': dir_name,
+                        'path': relative_path,
+                        'is_dir': True,
+                        'is_file': False
+                    })
+            
+            # Search in file names
+            for file_name in files:
+                if search_term in file_name.lower():
+                    file_path = os.path.join(root, file_name)
+                    relative_path = os.path.relpath(file_path, DATA_DIR)
+                    matches.append({
+                        'name': file_name,
+                        'path': relative_path,
+                        'is_dir': False,
+                        'is_file': True
+                    })
+        
+        # Sort results: directories first, then files
+        matches.sort(key=lambda x: (not x['is_dir'], x['name'].lower()))
+        
+        return jsonify({
+            'success': True,
+            'results': matches,
+            'search_term': search_term
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
