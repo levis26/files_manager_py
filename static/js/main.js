@@ -1,10 +1,23 @@
-// Función para mostrar alertas
-function showAlert(type, message) {
+// Función para mostrar alertas con más detalles
+function showAlert(type, message, extraInfo = '') {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.role = 'alert';
+    
+    // Agregar icono según el tipo
+    const iconClass = type === 'danger' ? 'bi-exclamation-triangle-fill' :
+                    type === 'success' ? 'bi-check-circle-fill' :
+                    type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                    'bi-info-circle-fill';
+    
     alertDiv.innerHTML = `
-        ${message}
+        <div class="d-flex align-items-center">
+            <i class="bi ${iconClass} me-2"></i>
+            <div>
+                ${message}
+                ${extraInfo ? `<small class="text-muted d-block">${extraInfo}</small>` : ''}
+            </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
@@ -98,36 +111,69 @@ async function loadDirectoryContent(path = '') {
                 `;
                 browserContent.appendChild(itemDiv);
             });
+            
+            // Mostrar mensaje de éxito
+            showAlert('success', 'Directorio cargado correctamente', 
+                `Mostrando ${data.items.length} elementos en ${data.current_path_display}`);
         } else {
-            showAlert('danger', data.message || 'Error al cargar el directorio');
+            showAlert('danger', 'Error al cargar el directorio', data.message || 'Por favor, intenta nuevamente');
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('danger', 'Error al cargar el contenido del directorio');
+        showAlert('danger', 'Error al cargar el contenido del directorio', 
+            error.message || 'Por favor, intenta nuevamente');
     }
 }
 
 // Función para previsualizar un archivo
 async function previewFile(path) {
     try {
-        const response = await fetch(`/api/preview?path=${encodeURIComponent(path)}`);
+        const response = await fetch(`/api/get-file-content?path=${encodeURIComponent(path)}`);
         const data = await response.json();
         
         if (data.success) {
-            const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-            document.getElementById('previewFileName').textContent = path.split('/').pop();
-            document.getElementById('previewFileContent').textContent = data.content;
-            modal.show();
+            const previewDiv = document.getElementById('file-preview');
+            previewDiv.innerHTML = `
+                <div class="mb-3">
+                    <label class="form-label">Ruta:</label>
+                    <input type="text" class="form-control" value="${path}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contenido:</label>
+                    <pre class="bg-light p-3 rounded"><code>${data.content}</code></pre>
+                </div>
+            `;
+            showAlert('success', 'Archivo previsualizado correctamente', 
+                `Mostrando contenido de ${path}`);
         } else {
-            showAlert('danger', data.message || 'Error al previsualizar el archivo');
+            showAlert('danger', 'Error al previsualizar el archivo', data.message || 'Por favor, intenta nuevamente');
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('danger', 'Error al previsualizar el archivo');
+        showAlert('danger', 'Error al previsualizar el archivo', 
+            error.message || 'Por favor, intenta nuevamente');
     }
 }
 
-// Función para establecer la ruta en los modales
+// Función para actualizar el contenido actual en el modal de append
+async function updateAppendModalContent(path) {
+    try {
+        const response = await fetch(`/api/get-file-content?path=${encodeURIComponent(path)}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('appendFileContentPreview').value = data.content;
+            showAlert('success', 'Contenido actualizado correctamente', 
+                `Mostrando contenido de ${path}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('danger', 'Error al cargar el contenido del archivo', 
+            error.message || 'Por favor, intenta nuevamente');
+    }
+}
+
+// Modificar la función setModalPath para actualizar el contenido del modal de append
 function setModalPath(modalId, path, currentName = '') {
     const modalElement = document.getElementById(modalId);
     const modal = new bootstrap.Modal(modalElement);
@@ -140,6 +186,7 @@ function setModalPath(modalId, path, currentName = '') {
         document.getElementById('deleteItemPath').value = path;
     } else if (modalId === 'appendModal') {
         document.getElementById('appendFilePath').value = path;
+        updateAppendModalContent(path); // Actualizar el contenido actual
     } else if (modalId === 'createDirModal' || modalId === 'createFileModal') {
         document.getElementById(`${modalId === 'createDirModal' ? 'createDirPath' : 'createFilePath'}`).value = path;
     }

@@ -1,6 +1,6 @@
 import os
 import shutil
-from flask import Flask, render_template, request, jsonify, flash
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for # Added redirect, url_for
 from flask_bootstrap import Bootstrap
 
 # --- Anticopy Placeholder ---
@@ -19,6 +19,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 DATA_DIR = 'data'
 
 # Helper function to get full path with security checks
+# --- Keeping this one ---
 def get_full_path(user_path):
     """
     Constructs the full path within DATA_DIR and validates it to prevent
@@ -31,6 +32,8 @@ def get_full_path(user_path):
             return os.path.abspath(DATA_DIR)
 
         # Normalizar la ruta y eliminar caracteres no deseados
+        # os.path.normpath handles '..' and '.' for security.
+        # .strip('/') is fine as it removes leading/trailing slashes, ensuring relative paths are treated consistently.
         normalized_path = os.path.normpath(user_path).strip('/')
         
         # Unir con DATA_DIR para obtener la ruta completa
@@ -47,27 +50,34 @@ def get_full_path(user_path):
             return None
             
         # Si la ruta no existe y estamos creando un nuevo directorio o archivo, permitirlo
+        # Ensure the parent directory exists for creation.
         if not os.path.exists(requested_abs):
             parent_dir = os.path.dirname(requested_abs)
-            if os.path.exists(parent_dir):
+            # Allow creation directly in DATA_DIR or in an existing subdirectory
+            if os.path.exists(parent_dir) or parent_dir == data_dir_abs:
                 return requested_abs
-            return None
+            return None # Parent directory does not exist
             
         return requested_abs
-    except Exception:
+    except Exception: # Catch all exceptions for path validation issues
         return None
 
 # Ensure the data directory exists when the app starts
+# --- Keeping this one (first occurrence) ---
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 
 @app.route('/')
 def index():
-    return render_template('index.html', current_context_path='')
+    """
+    Main page displaying the file browser interface.
+    """
+    return render_template('index.html')
 
 def get_current_path_display(path):
     """
-    Returns a human-readable display of the current path
+    Returns a human-readable display of the current path.
+    This function is used by the /api/browse endpoint to return the display path.
     """
     if not path:
         return 'data'
@@ -80,13 +90,17 @@ def get_current_path_display(path):
     
     # Create the display path
     display_path = 'data/'
-    if components:
+    if components and components != ['']: # Ensure components is not empty after split (e.g., for DATA_DIR itself)
         display_path += '/'.join(components)
     
     return display_path
 
 @app.route('/api/browse')
 def browse_directory():
+    """
+    API endpoint to browse directory contents.
+    --- Keeping this one (the last, more complete definition) ---
+    """
     current_path = request.args.get('path', '')
     full_current_path = get_full_path(current_path)
     
@@ -96,268 +110,13 @@ def browse_directory():
             'message': 'Invalid path'
         })
 
-    try:
-        items = []
-        for item in os.listdir(full_current_path):
-            item_path = os.path.join(full_current_path, item)
-            
-            # Get the relative path from DATA_DIR
-            relative_path = os.path.relpath(item_path, DATA_DIR)
-            
-            # Ensure the relative path starts with a slash
-            if not relative_path.startswith('/'):
-                relative_path = '/' + relative_path
-            
-            items.append({
-                'name': item,
-                'path': relative_path,
-                'is_dir': os.path.isdir(item_path),
-                'is_file': os.path.isfile(item_path)
-            })
-        items.sort(key=lambda x: (not x['is_dir'], x['name'].lower()))
-
-        return jsonify({
-            'success': True,
-            'items': items,
-            'current_path_display': get_current_path_display(full_current_path)
-        })
-    except Exception as e:
+    if not os.path.exists(full_current_path):
         return jsonify({
             'success': False,
-            'message': str(e)
+            'message': 'Path does not exist'
         })
 
-@app.route('/api/create_directory', methods=['POST'])
-def create_directory():
-    data = request.get_json()
-    path = data.get('path', '')
-    name = data.get('name', '')
-    
-    if not name:
-        return jsonify({
-            'success': False,
-            'message': 'Name is required'
-        })
-
-    full_path = get_full_path(os.path.join(path, name))
-    
-    if not full_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid path'
-        })
-
-    try:
-        os.makedirs(full_path)
-        return jsonify({
-            'success': True,
-            'message': 'Directory created successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        })
-
-@app.route('/api/create_file', methods=['POST'])
-def create_file():
-    data = request.get_json()
-    path = data.get('path', '')
-    name = data.get('name', '')
-    content = data.get('content', '')
-    
-    if not name:
-        return jsonify({
-            'success': False,
-            'message': 'Name is required'
-        })
-
-    full_path = get_full_path(os.path.join(path, name))
-    
-    if not full_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid path'
-        })
-
-    try:
-        with open(full_path, 'w') as f:
-            f.write(content)
-        return jsonify({
-            'success': True,
-            'message': 'File created successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        })
-
-@app.route('/api/append_file', methods=['POST'])
-def append_file():
-    data = request.get_json()
-    path = data.get('path', '')
-    content = data.get('content', '')
-    
-    if not path:
-        return jsonify({
-            'success': False,
-            'message': 'Path is required'
-        })
-
-    full_path = get_full_path(path)
-    
-    if not full_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid path'
-        })
-
-    try:
-        with open(full_path, 'a') as f:
-            f.write(content)
-        return jsonify({
-            'success': True,
-            'message': 'Content appended successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        })
-
-@app.route('/api/delete_item', methods=['POST'])
-def delete_item():
-    data = request.get_json()
-    path = data.get('path', '')
-    
-    if not path:
-        return jsonify({
-            'success': False,
-            'message': 'Path is required'
-        })
-
-    full_path = get_full_path(path)
-    
-    if not full_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid path'
-        })
-
-    try:
-        if os.path.isdir(full_path):
-            shutil.rmtree(full_path)
-        else:
-            os.remove(full_path)
-        return jsonify({
-            'success': True,
-            'message': 'Item deleted successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        })
-
-@app.route('/api/rename_item', methods=['POST'])
-def rename_item():
-    data = request.get_json()
-    old_path = data.get('old_path', '')
-    new_name = data.get('new_name', '')
-    
-    if not old_path or not new_name:
-        return jsonify({
-            'success': False,
-            'message': 'Path and new name are required'
-        })
-
-    old_full_path = get_full_path(old_path)
-    new_full_path = get_full_path(os.path.join(os.path.dirname(old_path), new_name))
-    
-    if not old_full_path or not new_full_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid paths'
-        })
-
-    try:
-        os.rename(old_full_path, new_full_path)
-        return jsonify({
-            'success': True,
-            'message': 'Item renamed successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        })
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-# Ensure the data directory exists when the app starts
-if not os.path.exists(DATA_DIR):
-    os.makedirs(DATA_DIR)
-
-def get_full_path(user_path):
-    """
-    Constructs the full path within DATA_DIR and validates it to prevent
-    directory traversal vulnerabilities.
-    Returns the absolute path if valid, otherwise returns None.
-    """
-    # Basic security: Reject paths starting with '/' or '..'
-    if user_path.startswith('/') or user_path.startswith('..'):
-         return None # Invalid path attempt
-
-    # Join data directory and user input path
-    # Use os.path.normpath to normalize the path (e.g., resolve './')
-    full_path = os.path.normpath(os.path.join(DATA_DIR, user_path))
-
-    # More robust security: Resolve absolute paths and check if they are
-    # truly within the absolute path of DATA_DIR.
-    try:
-        abs_data_dir = os.path.abspath(DATA_DIR)
-        abs_full_path = os.path.abspath(full_path)
-
-        # Check if the resolved path starts with the absolute data directory path
-        # and is not just the data directory itself if the user input was empty or '.'
-        # Add os.sep to ensure it's inside a subdirectory, not just the data dir itself
-        # unless the path is the data directory itself.
-        if not abs_full_path.startswith(abs_data_dir + os.sep) and abs_full_path != abs_data_dir:
-            return None # Path is outside DATA_DIR
-
-        return abs_full_path
-    except Exception as e:
-        # Log any exceptions during path validation
-        print(f"Path validation error for user path '{user_path}': {e}")
-        return None
-
-
-@app.route('/')
-def index():
-    """
-    Main page displaying the file browser interface.
-    """
-    return render_template('index.html')
-
-@app.route('/api/browse')
-def browse_directory():
-    """
-    API endpoint to browse directory contents.
-    """
-    current_path = request.args.get('path', '')
-    full_current_path = os.path.join(DATA_DIR, current_path)
-    abs_full_current_path = os.path.abspath(full_current_path)
-    abs_data_dir = os.path.abspath(DATA_DIR)
-
-    if not os.path.exists(abs_full_current_path) or not abs_full_current_path.startswith(abs_data_dir):
-        return jsonify({
-            'success': False,
-            'message': 'Invalid path'
-        })
-
-    if not os.path.isdir(abs_full_current_path):
+    if not os.path.isdir(full_current_path):
         return jsonify({
             'success': False,
             'message': 'Path is not a directory'
@@ -365,12 +124,12 @@ def browse_directory():
 
     items = []
     try:
-        with os.scandir(abs_full_current_path) as entries:
+        with os.scandir(full_current_path) as entries:
             for entry in entries:
                 relative_path = os.path.relpath(entry.path, DATA_DIR)
                 items.append({
                     'name': entry.name,
-                    'path': relative_path,
+                    'path': relative_path, # Paths from here DO NOT start with '/'
                     'is_dir': entry.is_dir(),
                     'is_file': entry.is_file()
                 })
@@ -384,14 +143,43 @@ def browse_directory():
 
     return jsonify({
         'success': True,
-        'currentPath': current_path,
-        'items': items
+        'items': items,
+        'current_path_display': get_current_path_display(full_current_path)
     })
+
+@app.route('/api/get-file-content')
+def get_file_content():
+    """
+    API endpoint to get file content.
+    --- Keeping this one (only one definition exists) ---
+    """
+    path = request.args.get('path', '')
+    full_path = get_full_path(path)
+    
+    if not full_path or not os.path.isfile(full_path):
+        return jsonify({
+            'success': False,
+            'message': 'Invalid file path or not a file'
+        })
+
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return jsonify({
+            'success': True,
+            'content': content
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
 
 @app.route('/api/create_dir', methods=['POST'])
 def create_directory():
     """
     API endpoint to create a new directory.
+    --- Keeping this one (the last definition) ---
     """
     data = request.get_json()
     path = data.get('path', '')
@@ -404,14 +192,20 @@ def create_directory():
         })
 
     full_path = get_full_path(os.path.join(path, name))
-    if not full_path:
+    if not full_path: # get_full_path ensures parent exists and path is valid for creation
         return jsonify({
             'success': False,
-            'message': 'Invalid path'
+            'message': 'Invalid path for creation or parent directory does not exist'
+        })
+    
+    if os.path.exists(full_path):
+        return jsonify({
+            'success': False,
+            'message': f"Directory '{name}' already exists"
         })
 
     try:
-        os.makedirs(full_path, exist_ok=True)
+        os.makedirs(full_path, exist_ok=False) # exist_ok=False because we check existence
         return jsonify({
             'success': True,
             'message': f"Directory '{name}' created successfully"
@@ -426,6 +220,7 @@ def create_directory():
 def create_file():
     """
     API endpoint to create a new file.
+    --- Keeping this one (the last definition) ---
     """
     data = request.get_json()
     path = data.get('path', '')
@@ -439,14 +234,20 @@ def create_file():
         })
 
     full_path = get_full_path(os.path.join(path, name))
-    if not full_path:
+    if not full_path: # get_full_path ensures parent exists and path is valid for creation
         return jsonify({
             'success': False,
-            'message': 'Invalid path'
+            'message': 'Invalid path for creation or parent directory does not exist'
+        })
+
+    if os.path.exists(full_path):
+        return jsonify({
+            'success': False,
+            'message': f"File '{name}' already exists"
         })
 
     try:
-        with open(full_path, 'w') as f:
+        with open(full_path, 'w', encoding='utf-8') as f:
             f.write(content)
         return jsonify({
             'success': True,
@@ -462,10 +263,11 @@ def create_file():
 def append_file():
     """
     API endpoint to append content to a file.
+    --- Keeping this one (the last definition) ---
     """
     data = request.get_json()
     path = data.get('path', '')
-    content = data.get('content', '').strip()  # Eliminar espacios en blanco al inicio y final
+    content = data.get('content', '').strip()
 
     if not path:
         return jsonify({
@@ -480,21 +282,20 @@ def append_file():
         })
 
     full_path = get_full_path(path)
-    if not full_path:
+    if not full_path or not os.path.isfile(full_path): # Ensure it's an existing file
         return jsonify({
             'success': False,
-            'message': 'Invalid path'
+            'message': 'Invalid file path or item is not a file'
         })
 
     try:
-        # Verificar si el archivo existe y tiene contenido
         if os.path.exists(full_path) and os.path.getsize(full_path) > 0:
-            # Si el archivo tiene contenido, agregar una nueva línea antes del contenido nuevo
-            with open(full_path, 'a') as f:
+            # If the file has content, add a newline before new content
+            with open(full_path, 'a', encoding='utf-8') as f:
                 f.write('\n' + content)
         else:
-            # Si el archivo está vacío, escribir el contenido directamente
-            with open(full_path, 'w') as f:
+            # If the file is empty or doesn't exist, write content directly
+            with open(full_path, 'w', encoding='utf-8') as f: # Changed mode to 'w' for empty file creation
                 f.write(content)
 
         return jsonify({
@@ -507,10 +308,11 @@ def append_file():
             'message': str(e)
         })
 
-@app.route('/api/delete', methods=['POST'])
+@app.route('/api/delete', methods=['POST']) # Note: endpoint name is delete
 def delete_item():
     """
     API endpoint to delete a file or directory.
+    --- Keeping this one (the last definition) ---
     """
     data = request.get_json()
     path = data.get('path', '')
@@ -526,6 +328,12 @@ def delete_item():
         return jsonify({
             'success': False,
             'message': 'Invalid path'
+        })
+    
+    if not os.path.exists(full_path): # Check if item exists before trying to delete
+        return jsonify({
+            'success': False,
+            'message': 'Item not found'
         })
 
     try:
@@ -541,10 +349,10 @@ def delete_item():
                 'success': True,
                 'message': f"Directory '{path}' and its contents deleted successfully"
             })
-        else:
+        else: # Should not be reached if get_full_path and os.path.exists work as expected
             return jsonify({
                 'success': False,
-                'message': 'Item not found'
+                'message': 'Item is neither a file nor a directory'
             })
     except OSError as e:
         return jsonify({
@@ -556,17 +364,14 @@ def delete_item():
             'success': False,
             'message': str(e)
         })
-    # If the path doesn't exist or isn't a file/directory (e.g., a broken symlink)
-    flash(f"Error: '{item_path}' not found or is not a file/directory.", "error")
 
-    # If there was an error, redirect back to the form, preserving context
 @app.route('/api/rename_item', methods=['POST'])
 def rename_item():
     """
     API endpoint to rename a file or directory.
+    --- Keeping this one (the last API definition) ---
     """
     try:
-        # Obtener los datos del request
         data = request.get_json()
         if not data:
             return jsonify({
@@ -577,66 +382,56 @@ def rename_item():
         old_path = data.get('oldPath', '').strip()
         new_name = data.get('newName', '').strip()
 
-        # Validar que ambos campos estén presentes
         if not old_path or not new_name:
             return jsonify({
                 'success': False,
                 'message': 'Por favor, ingrese una ruta y un nuevo nombre'
             })
 
-        # Verificar que el nuevo nombre no está vacío
-        if not new_name.strip():
+        if not new_name: # Check if new name is empty after strip()
             return jsonify({
                 'success': False,
                 'message': 'El nuevo nombre no puede estar vacío'
             })
 
-        # Obtener el directorio padre del archivo/directorio
         parent_dir = os.path.dirname(old_path)
-        
-        # Construir la nueva ruta completa
         new_path = os.path.join(parent_dir, new_name)
 
-        # Validar las rutas
         full_old_path = get_full_path(old_path)
-        full_new_path = get_full_path(new_path)
+        full_new_path = get_full_path(new_path) # This ensures the new path is valid and its parent exists
 
         if not full_old_path:
             return jsonify({
                 'success': False,
-                'message': f'Ruta inválida: {old_path}'
+                'message': f'Ruta inválida (antigua): {old_path}'
             })
 
         if not full_new_path:
             return jsonify({
                 'success': False,
-                'message': f'Ruta inválida: {new_path}'
+                'message': f'Ruta inválida (nueva) o directorio padre inexistente para: {new_name}'
             })
 
-        # Verificar si el archivo/directorio original existe
         if not os.path.exists(full_old_path):
             return jsonify({
                 'success': False,
                 'message': f'El archivo/directorio "{old_path}" no existe'
             })
 
-        # Verificar si el nuevo nombre ya existe
         if os.path.exists(full_new_path):
             return jsonify({
                 'success': False,
-                'message': f'Ya existe un archivo/directorio con el nombre "{new_name}"'
+                'message': f'Ya existe un archivo/directorio con el nombre "{new_name}" en la misma ubicación'
             })
 
-        # Verificar si estamos intentando mover el item a un directorio diferente
-        old_parent = os.path.dirname(full_old_path)
-        new_parent = os.path.dirname(full_new_path)
-        if old_parent != new_parent:
+        old_parent_abs = os.path.dirname(full_old_path)
+        new_parent_abs = os.path.dirname(full_new_path)
+        if old_parent_abs != new_parent_abs:
             return jsonify({
                 'success': False,
-                'message': 'No se puede mover el archivo/directorio a un directorio diferente'
+                'message': 'No se puede mover el archivo/directorio a un directorio diferente. Solo se permite renombrar en la misma ubicación.'
             })
 
-        # Realizar el renombrado
         os.rename(full_old_path, full_new_path)
 
         return jsonify({
@@ -657,84 +452,61 @@ def rename_item():
 @app.route('/rename_item', methods=['GET', 'POST'])
 def rename_item_view():
     """
-    Handle renaming a file or directory.
+    Handle renaming a file or directory via a traditional Flask view (not API).
     GET: Display the form with the current item path.
     POST: Process the rename operation.
+    --- Keeping this one (it's a separate view, not an API endpoint used by main.js for modals) ---
     """
-    # Get the original item path from query parameters for GET request
     original_path = request.args.get('item_path', '').strip()
-    # Get the context path (directory we were viewing) for redirects
     current_context_path = request.args.get('current_context_path', '').strip()
 
-
     if request.method == 'POST':
-        # Get original and new paths from form data for POST request
         original_path = request.form['original_path'].strip()
         new_name = request.form['new_name'].strip()
-        current_context_path = request.form.get('current_context_path', '').strip() # Get context path for POST
+        current_context_path = request.form.get('current_context_path', '').strip()
 
         if not original_path or not new_name:
             flash("Original path and new name cannot be empty.", "error")
-            # Redirect back to the rename form with original path and context
             return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
-        # Construct the full original path and validate it
         full_original_path = get_full_path(original_path)
 
         if full_original_path is None:
             flash("Invalid original path provided.", "error")
-            return redirect(url_for('index', current_path=current_context_path)) # Redirect to context or root
+            return redirect(url_for('index', current_path=current_context_path))
 
-        # Check if the original item exists
         if not os.path.exists(full_original_path):
             flash(f"Error: Original item '{original_path}' not found.", "error")
-            return redirect(url_for('index', current_path=current_context_path)) # Redirect to context or root
+            return redirect(url_for('index', current_path=current_context_path))
 
-        # Determine the parent directory of the original item
         parent_dir_of_original = os.path.dirname(original_path)
-
-        # Construct the full new path using the parent directory of the original item
-        # This prevents moving the item to a different directory during rename
         new_relative_path = os.path.join(parent_dir_of_original, new_name)
         full_new_path = get_full_path(new_relative_path)
 
-
         if full_new_path is None:
              flash("Invalid new name provided.", "error")
-             # Redirect back to the rename form with original path and context
              return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
-
-        # Prevent renaming if the new path already exists
         if os.path.exists(full_new_path):
             flash(f"Error: An item named '{new_relative_path}' already exists.", "error")
-            # Redirect back to the rename form with original path and context
             return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
-
         try:
-            # Perform the rename operation
             os.rename(full_original_path, full_new_path)
             flash(f"Item '{original_path}' renamed to '{new_relative_path}' successfully.", "success")
-            # Redirect back to the parent directory where the rename happened
             return redirect(url_for('index', current_path=parent_dir_of_original))
         except OSError as e:
             flash(f"Error renaming item '{original_path}': {e}", "error")
         except Exception as e:
              flash(f"An unexpected error occurred: {e}", "error")
 
-        # If there was an error, redirect back to the rename form
         return redirect(url_for('rename_item_view', item_path=original_path, current_context_path=current_context_path))
 
-
-    # For GET request, render the form template.
-    # We need to ensure the original_path is valid before displaying the form
     full_original_path_check = get_full_path(original_path)
     if full_original_path_check is None or not os.path.exists(full_original_path_check):
          flash("Error: Item to rename not found or invalid path.", "error")
-         return redirect(url_for('index', current_path=current_context_path)) # Redirect to context or root
+         return redirect(url_for('index', current_path=current_context_path))
 
-    # Extract just the current name from the original path for the form placeholder
     current_name = os.path.basename(original_path)
 
     return render_template('rename_item.html',
@@ -743,16 +515,12 @@ def rename_item_view():
                            current_context_path=current_context_path)
 
 
-if __name__ == '__main__':
-    # Run the Flask development server.
-    # debug=True enables auto-reloading and detailed error pages.
-    # Set to False in a production environment.
-    app.run(debug=True)
-
-
-# Añadir esta nueva ruta para manejar búsquedas
 @app.route('/api/search', methods=['GET'])
 def search_files():
+    """
+    API endpoint to search files and directories.
+    --- Keeping this one (only one definition exists) ---
+    """
     search_term = request.args.get('term', '').lower()
     current_path = request.args.get('path', '')
     
@@ -818,3 +586,9 @@ def search_files():
             'success': False,
             'message': f'Error al realizar la búsqueda: {str(e)}'
         })
+
+if __name__ == '__main__':
+    # Run the Flask development server.
+    # debug=True enables auto-reloading and detailed error pages.
+    # Set to False in a production environment.
+    app.run(debug=True)
