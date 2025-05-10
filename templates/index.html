@@ -40,19 +40,19 @@
                                 <i class="bi bi-gear me-2 fs-5"></i> Acciones
                             </h5>
                             <div class="list-group list-group-flush">
-                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#createDirModal">
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarCreateDirBtn">
                                     <i class="bi bi-folder-plus me-2"></i> Crear Carpeta
                                 </button>
-                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#createFileModal">
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarCreateFileBtn">
                                     <i class="bi bi-file-earmark-plus me-2"></i> Crear Archivo
                                 </button>
-                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#appendModal">
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarAppendBtn" disabled>
                                     <i class="bi bi-file-earmark-text me-2"></i> Agregar Contenido
                                 </button>
-                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarDeleteBtn" disabled>
                                     <i class="bi bi-trash me-2"></i> Eliminar
                                 </button>
-                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#renameModal">
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarRenameBtn" disabled>
                                     <i class="bi bi-pencil me-2"></i> Renombrar
                                 </button>
                             </div>
@@ -69,7 +69,7 @@
                                             <span class="fs-5">Tu estás en: <span id="currentPath" class="fw-bold text-primary">data/</span></span>
                                         </div>
                                     </div>
-                                    <div id="browser-content" class="list-group flex-grow-1 overflow-auto">
+                                    <div id="browser-content" class="list-group flex-grow-1 overflow-auto" onclick="clearSelection(event)"> 
                                         <div class="text-muted text-center py-5">Cargando...</div>
                                     </div>
                                 </div>
@@ -144,6 +144,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Crear</button>
+                    </div>
                     </div>
                 </form>
             </div>

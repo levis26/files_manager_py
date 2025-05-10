@@ -36,7 +36,7 @@ body {
     border-bottom: 1px solid #eee; /* Add a light border between items */
     padding: 0.75rem 1.25rem; /* Add padding */
     cursor: pointer; /* Indicate clickable items */
-    transition: background-color 0.2s ease; /* Smooth hover effect */
+    transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth hover and selection effect */
 }
 
 #browser-content .list-group-item:last-child {
@@ -46,6 +46,14 @@ body {
 #browser-content .list-group-item:hover {
     background-color: #f8f9fa; /* Light background on hover */
 }
+
+/* Estilo para el elemento seleccionado */
+#browser-content .list-group-item.list-group-item-primary {
+    background-color: #cfe2ff; /* Bootstrap primary light color */
+    border-color: #084298; /* Bootstrap primary dark color */
+    font-weight: bold; /* Make selected item text bold */
+}
+
 
 /* Estilos para los iconos dentro de los items */
 #browser-content .list-group-item i.bi {
@@ -91,7 +99,14 @@ body {
     background-color: #e9ecef; /* Light grey background on hover */
 }
 
-/* Ajustes para grupos de botones pequeños */
+/* Estilo para botones de acción deshabilitados en la sidebar */
+.list-group-item-action:disabled {
+    opacity: 0.5; /* Reduce opacity */
+    cursor: not-allowed; /* Show not-allowed cursor */
+    pointer-events: auto; /* Allow click event to be captured for showing alert */
+}
+
+/* Estilos para grupos de botones pequeños */
 .btn-group-sm > .btn {
     padding: 0.25rem 0.5rem; /* Smaller padding for small buttons */
     font-size: 0.875rem; /* Smaller font size */

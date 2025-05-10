@@ -1,4 +1,9 @@
-// Función para mostrar alertas con más detalles
+// Global variables to track the selected item
+let selectedItemPath = null;
+let selectedItemIsFile = false;
+let selectedItemElement = null; // Reference to the currently selected DOM element
+
+// Function to show alerts with more details
 function showAlert(type, message, extraInfo = '') {
     // console.log(`showAlert llamada: Tipo=${type}, Mensaje="${message}", InfoExtra="${extraInfo}"`); // Para verificar
     const alertDiv = document.createElement('div');
@@ -59,9 +64,104 @@ function showAlert(type, message, extraInfo = '') {
     }, 5000);
 }
 
+// Function to update the state of sidebar action buttons based on selection
+function updateSidebarButtonStates() {
+    const appendBtn = document.getElementById('sidebarAppendBtn');
+    const deleteBtn = document.getElementById('sidebarDeleteBtn');
+    const renameBtn = document.getElementById('sidebarRenameBtn');
+
+    if (selectedItemPath === null) {
+        // No item selected - disable append, delete, rename
+        if (appendBtn) appendBtn.disabled = true;
+        if (deleteBtn) deleteBtn.disabled = true;
+        if (renameBtn) renameBtn.disabled = true;
+    } else {
+        // Item is selected - enable delete and rename
+        if (deleteBtn) deleteBtn.disabled = false;
+        if (renameBtn) renameBtn.disabled = false;
+
+        // Enable append only if the selected item is a file
+        if (appendBtn) appendBtn.disabled = !selectedItemIsFile;
+    }
+}
+
+// Function to handle item selection in the browser list
+function selectItem(path, isFile, element) {
+    // Clear previous selection highlight
+    if (selectedItemElement) {
+        selectedItemElement.classList.remove('list-group-item-primary'); // Use Bootstrap primary color for highlight
+    }
+
+    // Set new selection
+    selectedItemPath = path;
+    selectedItemIsFile = isFile;
+    selectedItemElement = element;
+
+    // Add highlight to the selected element
+    if (selectedItemElement) {
+        selectedItemElement.classList.add('list-group-item-primary');
+    }
+
+    // Update sidebar button states based on the new selection
+    updateSidebarButtonStates();
+
+    // If a file is selected, preview it automatically
+    if (isFile) {
+        previewFile(path);
+    } else {
+        // Clear preview if a directory is selected or selection is cleared
+        const previewDiv = document.getElementById('file-preview');
+        if (previewDiv) {
+             previewDiv.innerHTML = `
+                <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                    Selecciona un archivo para ver su contenido
+                </div>
+            `;
+        }
+    }
+}
+
+// Function to clear the current selection
+function clearSelection(event) {
+    // Check if the click target is within an item element or a button within an item
+    // If not, clear the selection
+    const target = event.target;
+    const isItemElement = target.classList.contains('list-group-item');
+    const isButtonInItem = target.closest('.btn-group');
+
+    if (!isItemElement && !isButtonInItem) {
+        if (selectedItemElement) {
+            selectedItemElement.classList.remove('list-group-item-primary');
+        }
+        selectedItemPath = null;
+        selectedItemIsFile = false;
+        selectedItemElement = null;
+        updateSidebarButtonStates(); // Disable action buttons
+         // Clear preview when selection is cleared
+        const previewDiv = document.getElementById('file-preview');
+        if (previewDiv) {
+             previewDiv.innerHTML = `
+                <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                    Selecciona un archivo para ver su contenido
+                </div>
+            `;
+        }
+    }
+}
+
+
 // Function to load directory content from the backend API
 async function loadDirectoryContent(path = '') {
     try {
+        // Clear any previous selection before loading new content
+        if (selectedItemElement) {
+            selectedItemElement.classList.remove('list-group-item-primary');
+        }
+        selectedItemPath = null;
+        selectedItemIsFile = false;
+        selectedItemElement = null;
+        updateSidebarButtonStates(); // Disable action buttons
+
         // Construct the API URL with the encoded path
         const response = await fetch(`/api/browse?path=${encodeURIComponent(path)}`);
         // Parse the JSON response
@@ -78,15 +178,18 @@ async function loadDirectoryContent(path = '') {
             if (path) {
                 // Calculate the parent path
                 const parentPath = path.split('/').slice(0, -1).join('/');
-                const upDiv = document.createElement('button'); // Use button for better click handling
-                upDiv.className = 'list-group-item list-group-item-action d-flex align-items-center';
+                const upButton = document.createElement('button'); // Use button for better click handling
+                upButton.className = 'list-group-item list-group-item-action d-flex align-items-center';
                  // Use an anonymous function to correctly pass the parentPath
-                upDiv.onclick = () => loadDirectoryContent(parentPath);
-                upDiv.innerHTML = `
+                upButton.onclick = (event) => {
+                    event.stopPropagation(); // Prevent selecting the "Up Level" button itself
+                    loadDirectoryContent(parentPath);
+                };
+                upButton.innerHTML = `
                     <i class="bi bi-arrow-up-circle-fill me-2"></i>
                     Subir nivel
                 `;
-                browserContent.appendChild(upDiv);
+                browserContent.appendChild(upButton);
             }
             
             // Display directories first, then files
@@ -95,10 +198,9 @@ async function loadDirectoryContent(path = '') {
                 itemElement.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
                 
                 const iconClass = item.is_dir ? 'bi-folder-fill text-warning' : 'bi-file-earmark-fill text-primary';
-                const action = item.is_dir ? `loadDirectoryContent('${item.path}')` : `previewFile('${item.path}')`;
                 
                 itemElement.innerHTML = `
-                    <div class="d-flex align-items-center flex-grow-1 text-start" onclick="${action}">
+                    <div class="d-flex align-items-center flex-grow-1 text-start">
                         <i class="bi ${iconClass} me-2"></i>
                         ${item.name}
                     </div>
@@ -115,6 +217,18 @@ async function loadDirectoryContent(path = '') {
                         </button>
                     </div>
                 `;
+                 // Add click listener for item selection
+                itemElement.addEventListener('click', (event) => {
+                     // Prevent selecting the item if a button within it was clicked
+                     if (!event.target.closest('.btn-group')) {
+                        selectItem(item.path, item.is_file, itemElement);
+                        // If it's a directory, load its content on click
+                        if (item.is_dir) {
+                            loadDirectoryContent(item.path);
+                        }
+                     }
+                });
+
                 browserContent.appendChild(itemElement);
             });
             
@@ -224,8 +338,8 @@ function setModalPath(modalId, path, currentName = '') {
         showAlert('danger', 'Error interno', `Modal "${modalId}" no encontrado.`);
         return;
     }
-    const modal = new bootstrap.Modal(modalElement);
-    
+    // const modal = new bootstrap.Modal(modalElement); // Don't create a new modal instance here
+
     // Set the path in the corresponding modal input field
     if (modalId === 'renameModal') {
         document.getElementById('renameItemPath').value = path;
@@ -243,10 +357,9 @@ function setModalPath(modalId, path, currentName = '') {
     } 
     // Note: createDirModal and createFileModal paths are set via the 'show.bs.modal' listener
 
-    // Bootstrap's data-bs-toggle handles showing the modal,
-    // but calling modal.show() here is fine if you trigger it via JS click.
-    // If using data-bs-toggle in HTML, this function primarily sets the data.
-    // modal.show(); // Removed to rely on data-bs-toggle from HTML buttons
+    // Now, show the modal using Bootstrap's API
+    const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+    modalInstance.show();
 }
 
 // Function to handle file search
@@ -395,7 +508,7 @@ document.getElementById('createDirForm').addEventListener('submit', async (e) =>
     // console.log('Evento submit de createDirForm activado!'); // Para verificar
     
     const path = document.getElementById('createDirPath').value || ''; // Get parent path from modal input
-    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : ''; // Clean up path format
+    const formattedPath = path === '/' ? '' : path.replace(/^\/|\/$/g, ''); // Clean up path format, handle root as ""
     const name = document.getElementById('createDirName').value.trim(); // Get new directory name
 
     if (!name) {
@@ -421,7 +534,7 @@ document.getElementById('createDirForm').addEventListener('submit', async (e) =>
             // console.log('Directorio creado exitosamente, mostrando alerta.'); // Para verificar
             // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('createDirModal'));
-            modal.hide();
+            if (modal) modal.hide();
             // Reload the current directory content to show the new folder
             loadDirectoryContent(formattedPath);
             // Show success message from the backend
@@ -444,7 +557,7 @@ document.getElementById('createFileForm').addEventListener('submit', async (e) =
     // console.log('Evento submit de createFileForm activado!'); //Para verificar
 
     const path = document.getElementById('createFilePath').value || ''; // Get parent path from modal input
-    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : ''; // Clean up path format
+    const formattedPath = path === '/' ? '' : path.replace(/^\/|\/$/g, ''); // Clean up path format, handle root as ""
     const name = document.getElementById('createFileName').value.trim(); // Get new file name
     const content = document.getElementById('createFileContent').value; // Get file content
 
@@ -471,7 +584,7 @@ document.getElementById('createFileForm').addEventListener('submit', async (e) =
             // console.log('Archivo creado exitosamente, mostrando alerta.'); //Para verificar
             // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('createFileModal'));
-            modal.hide();
+            if (modal) modal.hide();
             // Reload the current directory content to show the new file
             loadDirectoryContent(formattedPath);
             // Show success message from the backend
@@ -520,7 +633,7 @@ document.getElementById('appendFileForm').addEventListener('submit', async (e) =
             // console.log('Contenido añadido exitosamente, mostrando alerta.'); // Para verificar
             // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('appendModal'));
-            modal.hide();
+            if (modal) modal.hide();
             // Reload the parent directory content (or the file itself if you implement that)
             const parentPath = formattedPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath); 
@@ -570,7 +683,7 @@ document.getElementById('deleteItemForm').addEventListener('submit', async (e) =
             // console.log('Elemento eliminado exitosamente, mostrando alerta.'); //Para verificar
             // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-            modal.hide();
+            if (modal) modal.hide();
             // Reload the parent directory content
             const parentPath = formattedPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath);
@@ -622,7 +735,7 @@ document.getElementById('renameItemForm').addEventListener('submit', async (e) =
             // console.log('Elemento renombrado exitosamente, mostrando alerta.'); // Para verificar
             // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
-            modal.hide();
+            if (modal) modal.hide();
             // Reload the parent directory content
             const parentPath = oldPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath);
@@ -673,10 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('createFilePath').value = currentPath || '/'; // Use '/' for root display in modal
                 }
                 // For appendModal, renameModal, deleteModal, the path is set by setModalPath when clicking the item button.
-                // We might need to call setModalPath here if modals are opened *without* clicking an item button,
-                // but based on the HTML structure, they are opened by item buttons or the main New Dir/File buttons.
-                // The main New Dir/File buttons (if they existed) would call setModalPath.
-                // With data-bs-toggle, the 'show.bs.modal' is the place to set the path for creation modals.
+                // We now handle sidebar button clicks separately below.
             });
 
              // Add listener for when the modal is hidden
@@ -692,9 +802,97 @@ document.addEventListener('DOMContentLoaded', () => {
                          previewArea.value = '';
                      }
                 }
+                 // Clear selection when any modal is closed
+                 if (selectedItemElement) {
+                    selectedItemElement.classList.remove('list-group-item-primary');
+                }
+                selectedItemPath = null;
+                selectedItemIsFile = false;
+                selectedItemElement = null;
+                updateSidebarButtonStates(); // Disable action buttons
+                // Clear preview when selection is cleared
+                const previewDiv = document.getElementById('file-preview');
+                if (previewDiv) {
+                        previewDiv.innerHTML = `
+                        <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                            Selecciona un archivo para ver su contenido
+                        </div>
+                    `;
+                }
             });
         } else {
             console.warn(`Modal element with ID "${modalId}" not found.`);
         }
     });
+
+    // --- Sidebar Action Button Event Listeners ---
+    // These buttons now rely on item selection
+
+    // Create Directory button - always enabled, opens modal with current path
+    const sidebarCreateDirBtn = document.getElementById('sidebarCreateDirBtn');
+    if (sidebarCreateDirBtn) {
+        sidebarCreateDirBtn.addEventListener('click', () => {
+            const modalElement = document.getElementById('createDirModal');
+            if (modalElement) {
+                const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modalInstance.show(); // show.bs.modal listener will set the path
+            }
+        });
+    } else { console.warn("Sidebar Create Directory button not found."); }
+
+    // Create File button - always enabled, opens modal with current path
+    const sidebarCreateFileBtn = document.getElementById('sidebarCreateFileBtn');
+     if (sidebarCreateFileBtn) {
+        sidebarCreateFileBtn.addEventListener('click', () => {
+            const modalElement = document.getElementById('createFileModal');
+            if (modalElement) {
+                const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modalInstance.show(); // show.bs.modal listener will set the path
+            }
+        });
+     } else { console.warn("Sidebar Create File button not found."); }
+
+
+    // Append Content button - requires a selected file
+    const sidebarAppendBtn = document.getElementById('sidebarAppendBtn');
+    if (sidebarAppendBtn) {
+        sidebarAppendBtn.addEventListener('click', () => {
+            if (selectedItemPath && selectedItemIsFile) {
+                setModalPath('appendModal', selectedItemPath); // Open modal and set path
+            } else {
+                showAlert('warning', 'Por favor, selecciona un archivo para agregar contenido.');
+            }
+        });
+    } else { console.warn("Sidebar Append button not found."); }
+
+    // Delete button - requires a selected item (file or directory)
+    const sidebarDeleteBtn = document.getElementById('sidebarDeleteBtn');
+    if (sidebarDeleteBtn) {
+        sidebarDeleteBtn.addEventListener('click', () => {
+            if (selectedItemPath) {
+                setModalPath('deleteModal', selectedItemPath); // Open modal and set path
+            } else {
+                showAlert('warning', 'Por favor, selecciona un archivo o directorio para eliminar.');
+            }
+        });
+    } else { console.warn("Sidebar Delete button not found."); }
+
+
+    // Rename button - requires a selected item (file or directory)
+    const sidebarRenameBtn = document.getElementById('sidebarRenameBtn');
+     if (sidebarRenameBtn) {
+        sidebarRenameBtn.addEventListener('click', () => {
+            if (selectedItemPath) {
+                 // Need the item name for the rename modal - get it from the path
+                 const itemName = selectedItemPath.split('/').pop();
+                setModalPath('renameModal', selectedItemPath, itemName); // Open modal and set path and name
+            } else {
+                showAlert('warning', 'Por favor, selecciona un archivo o directorio para renombrar.');
+            }
+        });
+     } else { console.warn("Sidebar Rename button not found."); }
+
+
+    // Initialize sidebar button states (they start disabled)
+    updateSidebarButtonStates();
 });
