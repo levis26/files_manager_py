@@ -1,118 +1,87 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Archivos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
 
-{% block content %}
-    <div class="container-fluid py-4">
-        <!-- Contenedor principal con sombra y borde redondeado -->
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-11 col-md-10 col-lg-9 col-xl-8">
-                <div class="card shadow-lg rounded-4 border-0">
-                    <!-- Barra de navegación con sombra interna -->
-                    <nav class="navbar navbar-expand-lg navbar-light bg-light bg-gradient p-3">
-                        <div class="container-fluid">
-                            <a class="navbar-brand d-flex align-items-center" href="#">
-                                <i class="bi bi-folder2-open me-2 fs-4"></i>
-                                <span class="fs-4 fw-bold">Gestor de Archivos</span>
-                            </a>
-                            <div class="d-flex align-items-center ms-auto">
-                                <div class="input-group me-3">
-                                    <span class="input-group-text bg-white border-end-0">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <input type="text" class="form-control border-start-0 rounded-end" id="searchInput" 
-                                           placeholder="Buscar archivos..." 
-                                           oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(searchFiles, 300)">
-                                </div>
-                                <button class="btn btn-outline-primary" onclick="window.location.reload()">
-                                    <i class="bi bi-arrow-clockwise"></i> Recargar
+    <div class="container my-4">
+        <div class="card shadow-lg rounded-4 border-0">
+            <div class="card-header bg-light bg-gradient p-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-folder2-open me-2 fs-4 text-primary"></i>
+                    <span class="fs-4 fw-bold">Gestor de Archivos</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="input-group me-3">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 rounded-end" id="searchInput" 
+                               placeholder="Buscar archivos..." 
+                               oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(searchFiles, 300)">
+                    </div>
+                    <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i> Recargar
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-3 col-lg-2 border-end">
+                        <div class="p-3">
+                            <h5 class="d-flex align-items-center mb-3">
+                                <i class="bi bi-gear me-2 fs-5"></i> Acciones
+                            </h5>
+                            <div class="list-group list-group-flush">
+                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#createDirModal">
+                                    <i class="bi bi-folder-plus me-2"></i> Crear Carpeta
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#createFileModal">
+                                    <i class="bi bi-file-earmark-plus me-2"></i> Crear Archivo
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#appendModal">
+                                    <i class="bi bi-file-earmark-text me-2"></i> Agregar Contenido
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="bi bi-trash me-2"></i> Eliminar
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#renameModal">
+                                    <i class="bi bi-pencil me-2"></i> Renombrar
                                 </button>
                             </div>
                         </div>
-                    </nav>
+                    </div>
 
-                    <!-- Contenido principal -->
-                    <div class="row g-0">
-                        <!-- Barra lateral -->
-                        <div class="col-md-3 col-lg-2 col-xl-2 border-end">
-                            <div class="card h-100 border-0">
-                                <div class="card-body p-3">
-                                    <h5 class="card-title mb-4 d-flex align-items-center">
-                                        <i class="bi bi-gear me-2 fs-5"></i>
-                                        <span class="fs-5 fw-bold">Acciones</span>
-                                    </h5>
-                                    <div class="list-group list-group-flush">
-                                        <button type="button" class="list-group-item list-group-item-action px-3 py-3" 
-                                                data-bs-toggle="modal" data-bs-target="#createDirModal">
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-folder-plus me-2 fs-6"></i>
-                                                <span class="fs-6">Crear Carpeta</span>
-                                            </div>
-                                        </button>
-                                        <button type="button" class="list-group-item list-group-item-action px-3 py-3" 
-                                                data-bs-toggle="modal" data-bs-target="#createFileModal">
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-file-earmark-plus me-2 fs-6"></i>
-                                                <span class="fs-6">Crear Archivo</span>
-                                            </div>
-                                        </button>
-                                        <button type="button" class="list-group-item list-group-item-action px-3 py-3" 
-                                                data-bs-toggle="modal" data-bs-target="#appendModal">
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-file-earmark-text me-2 fs-6"></i>
-                                                <span class="fs-6">Agregar Contenido</span>
-                                            </div>
-                                        </button>
-                                        <button type="button" class="list-group-item list-group-item-action px-3 py-3" 
-                                                data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-trash me-2 fs-6"></i>
-                                                <span class="fs-6">Eliminar</span>
-                                            </div>
-                                        </button>
-                                        <button type="button" class="list-group-item list-group-item-action px-3 py-3" 
-                                                data-bs-toggle="modal" data-bs-target="#renameModal">
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-pencil me-2 fs-6"></i>
-                                                <span class="fs-6">Renombrar</span>
-                                            </div>
-                                        </button>
+                    <div class="col-md-9 col-lg-10">
+                        <div class="row g-0 h-100">
+                            <div class="col-md-8 border-end">
+                                <div class="p-3 h-100 d-flex flex-column">
+                                     <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="h5 mb-0 d-flex align-items-center">
+                                            <i class="bi bi-folder2-open me-2 fs-5 text-secondary"></i>
+                                            <span class="fs-5">Tu estás en: <span id="currentPath" class="fw-bold text-primary">data/</span></span>
+                                        </div>
+                                    </div>
+                                    <div id="browser-content" class="list-group flex-grow-1 overflow-auto">
+                                        <div class="text-muted text-center py-5">Cargando...</div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Área principal -->
-                        <div class="col-md-9 col-lg-10 col-xl-10">
-                            <div class="card h-100 border-0">
-                                <div class="card-body p-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <div class="h5 mb-0 d-flex align-items-center">
-                                            <i class="bi bi-folder2-open me-2 fs-5"></i>
-                                            <span class="fs-5">Tu estás en: <span id="currentPath" class="fw-bold">data</span></span>
-                                        </div>
-                                    </div>
-                                    <div class="row g-0 h-100">
-                                        <!-- Navegación de archivos -->
-                                        <div class="col-md-8 col-lg-8 col-xl-8 h-100">
-                                            <div id="browser-content" class="h-100 overflow-auto p-3">
-                                                <!-- Contenido dinámico -->
-                                            </div>
-                                        </div>
-                                        <!-- Previsualización -->
-                                        <div class="col-md-4 col-lg-4 col-xl-4 h-100">
-                                            <div class="card h-100 border-0">
-                                                <div class="card-header bg-light bg-gradient">
-                                                    <h5 class="card-title mb-0 d-flex align-items-center">
-                                                        <i class="bi bi-eye me-2 fs-5"></i>
-                                                        <span class="fs-5">Previsualización</span>
-                                                    </h5>
-                                                </div>
-                                                <div class="card-body h-100 overflow-auto p-3" id="file-preview">
-                                                    <div class="text-muted text-center py-5">
-                                                        Selecciona un archivo para ver su contenido
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="col-md-4">
+                                <div class="p-3 h-100 d-flex flex-column">
+                                    <h5 class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-eye me-2 fs-5"></i> Previsualización
+                                    </h5>
+                                    <div id="file-preview" class="flex-grow-1 overflow-auto bg-light p-3 rounded-3 text-muted text-center d-flex align-items-center justify-content-center">
+                                        Selecciona un archivo para ver su contenido
                                     </div>
                                 </div>
                             </div>
@@ -123,379 +92,150 @@
         </div>
     </div>
 
-    <!-- Modales -->
-    <div class="modal fade" id="createDirModal" tabindex="-1">
+    <div class="modal fade" id="createDirModal" tabindex="-1" aria-labelledby="createDirModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-folder-plus me-2"></i>Crear Carpeta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="createDirModalLabel"><i class="bi bi-folder-plus me-2"></i>Crear Carpeta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="createDirForm">
+                <form id="createDirForm">
+                    <div class="modal-body">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="createDirPath" hidden>
+                            <label for="createDirPath" class="form-label">En directorio:</label>
+                            <input type="text" class="form-control" id="createDirPath" readonly> 
                         </div>
                         <div class="mb-3">
-                            <label for="createDirName" class="form-label">Nombre de la carpeta</label>
+                            <label for="createDirName" class="form-label">Nombre de la nueva carpeta:</label>
                             <input type="text" class="form-control" id="createDirName" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </div>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                </div>
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="createFileModal" tabindex="-1">
+    <div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-file-earmark-plus me-2"></i>Crear Archivo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="createFileModalLabel"><i class="bi bi-file-earmark-plus me-2"></i>Crear Archivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="createFileForm">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="createFilePath" hidden>
+                <form id="createFileForm">
+                    <div class="modal-body">
+                         <div class="mb-3">
+                            <label for="createFilePath" class="form-label">En directorio:</label>
+                            <input type="text" class="form-control" id="createFilePath" readonly> 
                         </div>
                         <div class="mb-3">
-                            <label for="createFileName" class="form-label">Nombre del archivo</label>
+                            <label for="createFileName" class="form-label">Nombre del nuevo archivo:</label>
                             <input type="text" class="form-control" id="createFileName" required>
                         </div>
                         <div class="mb-3">
-                            <label for="createFileContent" class="form-label">Contenido</label>
-                            <textarea class="form-control" id="createFileContent" rows="4"></textarea>
+                            <label for="createFileContent" class="form-label">Contenido inicial (Opcional):</label>
+                            <textarea class="form-control" id="createFileContent" rows="5"></textarea>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Crear</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="appendModal" tabindex="-1">
+     <div class="modal fade" id="appendModal" tabindex="-1" aria-labelledby="appendModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Agregar Contenido</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="appendModalLabel"><i class="bi bi-file-earmark-text me-2"></i>Agregar Contenido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="appendFileForm">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="appendFilePath" hidden>
+                <form id="appendFileForm">
+                    <div class="modal-body">
+                         <div class="mb-3">
+                            <label for="appendFilePath" class="form-label">A archivo:</label>
+                            <input type="text" class="form-control" id="appendFilePath" readonly> 
+                        </div>
+                         <div class="mb-3">
+                            <label for="appendFileContentPreview" class="form-label">Contenido actual:</label>
+                            <textarea class="form-control" id="appendFileContentPreview" rows="5" readonly></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="appendFileContent" class="form-label">Contenido a agregar</label>
-                            <textarea class="form-control" id="appendFileContent" rows="4" required></textarea>
+                            <label for="appendFileContent" class="form-label">Contenido a agregar:</label>
+                            <textarea class="form-control" id="appendFileContent" rows="3" required></textarea>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Agregar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-trash me-2"></i>Eliminar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="deleteModalLabel"><i class="bi bi-trash me-2"></i>Eliminar Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="deleteItemForm">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="deleteItemPath" hidden>
-                        </div>
-                        <div class="alert alert-warning mt-3">
+                <form id="deleteItemForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="deleteItemPath" name="path">
+                        <p>¿Estás seguro de que quieres eliminar <strong id="deleteItemNameDisplay">este item</strong>? Esta acción no se puede deshacer.</p>
+                         <div class="alert alert-warning mt-3 small">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            ¡Advertencia! Esta acción no se puede deshacer.
+                            Advertencia: Eliminar un directorio borrará todo su contenido de forma recursiva.
                         </div>
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                </div>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="renameModal" tabindex="-1">
+     <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Renombrar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="renameModalLabel"><i class="bi bi-pencil me-2"></i>Renombrar Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="renameItemForm">
+                <form id="renameItemForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="renameItemPath" name="oldPath">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="renameItemPath" hidden>
-                        </div>
-                        <div class="mb-3">
-                            <label for="renameItemName" class="form-label">Nuevo nombre</label>
+                            <label for="renameItemName" class="form-label">Nuevo nombre:</label>
                             <input type="text" class="form-control" id="renameItemName" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Renombrar</button>
+                         <div class="alert alert-info mt-3 small">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Solo se permite renombrar dentro del mismo directorio.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                </div>
+                        <button type="submit" class="btn btn-primary">Renombrar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-{% endblock %}
-        }
-        /* Estilos generales */
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #0dcaf0;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-        }
 
-        .action-list li {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
 
-        .action-list li:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        .browser-list li {
-            border-bottom: none;
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .browser-list li:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        a {
-            text-decoration: none;
-            color: var(--primary-color);
-            font-size: 1rem;
-            display: inline-block;
-            padding: 0.5rem 0;
-            transition: all 0.3s ease;
-        }
-
-        a:hover {
-            text-decoration: underline;
-            color: #0056b3;
-        }
-
-        /* Estilos para el contenedor principal */
-        .container-fluid {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            transition: all 0.2s ease;
-        }
-
-        .list-group-item-action:hover {
-            background-color: rgba(0, 123, 255, 0.075);
-            color: #007bff;
-        }
-
-        /* Estilos para el área de previsualización */
-        #file-preview {
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        /* Estilos para la barra de navegación */
-        .navbar {
-            padding: 0.75rem 1rem;
-        }
-
-        .navbar-brand {
-            font-weight: 600;
-        }
-
-        /* Estilos para pantallas pequeñas */
-        @media (max-width: 768px) {
-            .col-md-3 {
-                margin-bottom: 1rem;
-            }
-            
-            .col-md-9 {
-                margin-top: 1rem;
-            }
-            
-            #file-preview {
-                font-size: 0.9rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-4">
-        <h1 class="mb-4">Gestor de Archivos</h1>
-
-        <!-- Barra de navegación -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-            <div class="container-fluid">
-                <span class="navbar-brand">Ruta actual:</span>
-                <span id="current-path" class="ms-2"></span>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDirModal">
-                                <i class="bi bi-folder-plus"></i> Nuevo Directorio
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFileModal">
-                                <i class="bi bi-file-earmark-plus"></i> Nuevo Archivo
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Navegador de archivos -->
-        <div class="card">
-            <div class="card-body file-browser" id="directory-list">
-                <!-- Contenido dinámico -->
-            </div>
-        </div>
-
-        <!-- Modal para crear directorio -->
-        <div class="modal fade" id="createDirModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-folder-plus"></i> Crear Directorio</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="create-dir-form">
-                            <div class="mb-3">
-                                <label for="dir-name" class="form-label">Nombre del directorio</label>
-                                <input type="text" class="form-control" id="dir-name" required>
-                            </div>
-                            <input type="hidden" id="current-path" name="path">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Crear</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para crear archivo -->
-        <div class="modal fade" id="createFileModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-file-earmark-plus"></i> Crear Archivo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="create-file-form">
-                            <div class="mb-3">
-                                <label for="file-name" class="form-label">Nombre del archivo</label>
-                                <input type="text" class="form-control" id="file-name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="file-content" class="form-label">Contenido del archivo</label>
-                                <textarea class="form-control" id="file-content" rows="4"></textarea>
-                            </div>
-                            <input type="hidden" id="current-path" name="path">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Crear</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para agregar contenido -->
-        <div class="modal fade" id="appendModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-file-earmark-plus"></i> Agregar Contenido</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="append-file-form">
-                            <div class="mb-3">
-                                <label for="append-content" class="form-label">Contenido a agregar</label>
-                                <textarea class="form-control" id="append-content" rows="4"></textarea>
-                            </div>
-                            <input type="hidden" id="append-file-path" name="path">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Agregar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para eliminar item -->
-        <div class="modal fade" id="deleteModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-trash"></i> Eliminar Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Estás seguro de que quieres eliminar este item? Esta acción no se puede deshacer.</p>
-                        <form id="delete-item-form">
-                            <input type="hidden" id="delete-path" name="path">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="{{ url_for('static', filename='js/file_manager.js') }}"></script>
-    </div>
-        // Optional: Copy path to clipboard when clicking the input field
-        if (filePathInput) {
-            filePathInput.addEventListener('click', function() {
-                if (this.value) {
-                    navigator.clipboard.writeText(this.value).then(function() {
-                        // Optional: Provide visual feedback (e.g., change border color temporarily)
-                         filePathInput.style.borderColor = '#28a745'; // Green
-                         setTimeout(() => { filePathInput.style.borderColor = '#ccc'; }, 1000);
-                    }).catch(function(err) {
-                        console.error('Could not copy text: ', err);
-                    });
-                }
-            });
-        }
-
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

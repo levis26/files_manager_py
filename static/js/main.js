@@ -1,10 +1,12 @@
 // Función para mostrar alertas con más detalles
 function showAlert(type, message, extraInfo = '') {
+    // console.log(`showAlert llamada: Tipo=${type}, Mensaje="${message}", InfoExtra="${extraInfo}"`); // Para verificar
     const alertDiv = document.createElement('div');
+    // Use Bootstrap alert classes for styling
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.role = 'alert';
     
-    // Agregar icono según el tipo
+    // Add icon based on alert type using Bootstrap Icons
     const iconClass = type === 'danger' ? 'bi-exclamation-triangle-fill' :
                     type === 'success' ? 'bi-check-circle-fill' :
                     type === 'warning' ? 'bi-exclamation-triangle-fill' :
@@ -21,234 +23,305 @@ function showAlert(type, message, extraInfo = '') {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
-    // Insertar al principio del contenedor
-    const container = document.querySelector('.container');
-    if (container.firstChild) {
-        container.insertBefore(alertDiv, container.firstChild);
+    // Insert at the beginning of the main container where alerts should appear
+    const container = document.querySelector('.container'); // Target the main Bootstrap container
+    // console.log('Elemento "container" para la alerta:', container); //Para verificar
+    if (!container) { 
+        console.error("No se encontró el elemento '.container' para mostrar la alerta.");
+        // Fallback: Log to console if container not found
+        console.log(`ALERTA (${type}): ${message} - ${extraInfo}`);
+        return;
+    }
+    
+    // Find the first child that is NOT another alert to insert before it
+    let firstNonAlertChild = null;
+    for (let i = 0; i < container.children.length; i++) {
+        if (!container.children[i].classList.contains('alert')) {
+            firstNonAlertChild = container.children[i];
+            break;
+        }
+    }
+
+    if (firstNonAlertChild) {
+        container.insertBefore(alertDiv, firstNonAlertChild);
     } else {
+         // If all children are alerts or container is empty, just append
         container.appendChild(alertDiv);
     }
     
-    // Auto-ocultar después de 5 segundos
+    // Auto-hide after 5 seconds
     setTimeout(() => {
-        const bsAlert = new bootstrap.Alert(alertDiv);
-        bsAlert.close();
+        // Ensure the element still exists before trying to close
+        if (alertDiv.parentNode) {
+            const bsAlert = new bootstrap.Alert(alertDiv);
+            bsAlert.close();
+        }
     }, 5000);
 }
 
-// Función para cargar el contenido de un directorio
+// Function to load directory content from the backend API
 async function loadDirectoryContent(path = '') {
     try {
+        // Construct the API URL with the encoded path
         const response = await fetch(`/api/browse?path=${encodeURIComponent(path)}`);
+        // Parse the JSON response
         const data = await response.json();
         
         if (data.success) {
-            // Actualizar la ruta actual mostrada
-            document.getElementById('currentPath').textContent = data.current_path_display || 'data';
+            // Update the displayed current path
+            document.getElementById('currentPath').textContent = data.current_path_display || 'data/'; // Ensure trailing slash for root display
             
             const browserContent = document.getElementById('browser-content');
-            browserContent.innerHTML = '';
+            browserContent.innerHTML = ''; // Clear previous content
             
-            // Mostrar botón para subir un nivel si no estamos en la raíz
+            // Show "Up Level" button if not in the root directory
             if (path) {
+                // Calculate the parent path
                 const parentPath = path.split('/').slice(0, -1).join('/');
-                const upDiv = document.createElement('div');
-                upDiv.className = 'd-flex align-items-center mb-2';
+                const upDiv = document.createElement('button'); // Use button for better click handling
+                upDiv.className = 'list-group-item list-group-item-action d-flex align-items-center';
+                 // Use an anonymous function to correctly pass the parentPath
+                upDiv.onclick = () => loadDirectoryContent(parentPath);
                 upDiv.innerHTML = `
                     <i class="bi bi-arrow-up-circle-fill me-2"></i>
-                    <a href="#" class="text-decoration-none" onclick="loadDirectoryContent('${parentPath}')">
-                        Subir nivel
-                    </a>
+                    Subir nivel
                 `;
                 browserContent.appendChild(upDiv);
             }
             
-            // Mostrar directorios primero
-            data.items.filter(item => item.is_dir).forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border-bottom';
-                itemDiv.innerHTML = `
-                    <div>
-                        <i class="bi bi-folder-fill text-warning me-2"></i>
-                        <a href="#" class="text-decoration-none" onclick="loadDirectoryContent('${item.path}')">
-                            ${item.name}
-                        </a>
+            // Display directories first, then files
+            data.items.forEach(item => {
+                const itemElement = document.createElement('button'); // Use button for better click handling
+                itemElement.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+                
+                const iconClass = item.is_dir ? 'bi-folder-fill text-warning' : 'bi-file-earmark-fill text-primary';
+                const action = item.is_dir ? `loadDirectoryContent('${item.path}')` : `previewFile('${item.path}')`;
+                
+                itemElement.innerHTML = `
+                    <div class="d-flex align-items-center flex-grow-1 text-start" onclick="${action}">
+                        <i class="bi ${iconClass} me-2"></i>
+                        ${item.name}
                     </div>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="setModalPath('renameModal', '${item.path}', '${item.name}')">
+                    <div class="btn-group btn-group-sm" role="group" onclick="event.stopPropagation()"> ${item.is_file ? 
+                            `<button type="button" class="btn btn-outline-secondary" onclick="setModalPath('appendModal', '${item.path}')" title="Agregar Contenido">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>` : ''
+                        }
+                        <button type="button" class="btn btn-outline-secondary" onclick="setModalPath('renameModal', '${item.path}', '${item.name}')" title="Renombrar">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="setModalPath('deleteModal', '${item.path}')">
+                        <button type="button" class="btn btn-outline-danger" onclick="setModalPath('deleteModal', '${item.path}')" title="Eliminar">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
                 `;
-                browserContent.appendChild(itemDiv);
+                browserContent.appendChild(itemElement);
             });
             
-            // Mostrar archivos después
-            data.items.filter(item => item.is_file).forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border-bottom';
-                itemDiv.innerHTML = `
-                    <div>
-                        <i class="bi bi-file-earmark-fill text-primary me-2"></i>
-                        <a href="#" class="text-decoration-none" onclick="previewFile('${item.path}')">
-                            ${item.name}
-                        </a>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="setModalPath('appendModal', '${item.path}')">
-                            <i class="bi bi-plus-circle"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="setModalPath('renameModal', '${item.path}', '${item.name}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="setModalPath('deleteModal', '${item.path}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                `;
-                browserContent.appendChild(itemDiv);
-            });
-            
-            // Mostrar mensaje de éxito
-            showAlert('success', 'Directorio cargado correctamente', 
-                `Mostrando ${data.items.length} elementos en ${data.current_path_display}`);
+            // Optional: Show a success message for initial load, but might be too frequent
+            // showAlert('success', 'Directorio cargado correctamente', 
+            //     `Mostrando ${data.items.length} elementos en ${data.current_path_display}`);
         } else {
+            // Show error message from the backend
             showAlert('danger', 'Error al cargar el directorio', data.message || 'Por favor, intenta nuevamente');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al cargar el contenido del directorio', 
-            error.message || 'Por favor, intenta nuevamente');
+        console.error('Error al cargar el contenido del directorio:', error);
+        // Show a generic error message in case of network issues or unhandled exceptions
+        showAlert('danger', 'Error de conexión o del servidor', 
+            'No se pudo cargar el contenido del directorio. Por favor, verifica la consola para más detalles.');
     }
 }
 
-// Función para previsualizar un archivo
+// Function to preview file content
 async function previewFile(path) {
     try {
         const response = await fetch(`/api/get-file-content?path=${encodeURIComponent(path)}`);
         const data = await response.json();
         
+        const previewDiv = document.getElementById('file-preview');
+        if (!previewDiv) {
+             console.error("Elemento '#file-preview' no encontrado.");
+             showAlert('danger', 'Error interno', 'No se encontró el panel de previsualización.');
+             return;
+        }
+
         if (data.success) {
-            const previewDiv = document.getElementById('file-preview');
+            // Display the file path and content
             previewDiv.innerHTML = `
-                <div class="mb-3">
-                    <label class="form-label">Ruta:</label>
-                    <input type="text" class="form-control" value="${path}" readonly>
+                <div class="mb-2">
+                    <small class="text-muted">Ruta: ${path}</small>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Contenido:</label>
-                    <pre class="bg-light p-3 rounded"><code>${data.content}</code></pre>
+                <pre class="bg-white p-2 rounded-3 overflow-auto flex-grow-1"><code>${escapeHTML(data.content)}</code></pre>
+            `;
+            // showAlert('success', 'Archivo previsualizado correctamente', `Mostrando contenido de ${path}`); // Optional alert
+        } else {
+             // Display error message in the preview panel
+             previewDiv.innerHTML = `
+                <div class="text-muted text-center py-5">
+                    <i class="bi bi-x-circle-fill text-danger fs-4 mb-2"></i>
+                    <p>Error al cargar el archivo: ${data.message || 'Desconocido'}</p>
                 </div>
             `;
-            showAlert('success', 'Archivo previsualizado correctamente', 
-                `Mostrando contenido de ${path}`);
-        } else {
             showAlert('danger', 'Error al previsualizar el archivo', data.message || 'Por favor, intenta nuevamente');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al previsualizar el archivo', 
-            error.message || 'Por favor, intenta nuevamente');
+        console.error('Error al previsualizar el archivo:', error);
+         const previewDiv = document.getElementById('file-preview');
+         previewDiv.innerHTML = `
+            <div class="text-muted text-center py-5">
+                <i class="bi bi-x-circle-fill text-danger fs-4 mb-2"></i>
+                <p>Error de conexión o del servidor al previsualizar.</p>
+            </div>
+        `;
+        showAlert('danger', 'Error de conexión o del servidor', 
+            'No se pudo previsualizar el archivo. Por favor, verifica la consola para más detalles.');
     }
 }
 
-// Función para actualizar el contenido actual en el modal de append
+// Helper function to escape HTML characters for safe display in <pre><code>
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+
+// Function to update the current content in the append modal preview area
 async function updateAppendModalContent(path) {
     try {
         const response = await fetch(`/api/get-file-content?path=${encodeURIComponent(path)}`);
         const data = await response.json();
         
+        const previewArea = document.getElementById('appendFileContentPreview');
+         if (!previewArea) {
+             console.error("Elemento '#appendFileContentPreview' no encontrado.");
+             return; // Cannot update if element doesn't exist
+         }
+
         if (data.success) {
-            document.getElementById('appendFileContentPreview').value = data.content;
-            showAlert('success', 'Contenido actualizado correctamente', 
-                `Mostrando contenido de ${path}`);
+            previewArea.value = data.content;
+            // showAlert('success', 'Contenido actual cargado', `Para ${path}`); // Optional alert
+        } else {
+            // Display error or clear preview if content cannot be loaded
+            previewArea.value = `Error al cargar contenido: ${data.message || 'Desconocido'}`;
+             console.error('Error al cargar contenido para previsualización en modal de append:', data.message);
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al cargar el contenido del archivo', 
-            error.message || 'Por favor, intenta nuevamente');
+        console.error('Error al cargar el contenido del archivo para previsualización en modal de append:', error);
+         const previewArea = document.getElementById('appendFileContentPreview');
+         if (previewArea) {
+             previewArea.value = `Error de conexión o del servidor al cargar contenido.`;
+         }
     }
 }
 
-// Modificar la función setModalPath para actualizar el contenido del modal de append
+// Function to set modal specific data before showing it
 function setModalPath(modalId, path, currentName = '') {
     const modalElement = document.getElementById(modalId);
+    if (!modalElement) {
+        console.error(`Modal con ID "${modalId}" no encontrado.`);
+        showAlert('danger', 'Error interno', `Modal "${modalId}" no encontrado.`);
+        return;
+    }
     const modal = new bootstrap.Modal(modalElement);
     
-    // Establecer la ruta en el modal correspondiente
+    // Set the path in the corresponding modal input field
     if (modalId === 'renameModal') {
         document.getElementById('renameItemPath').value = path;
-        document.getElementById('renameItemName').value = currentName;
+        document.getElementById('renameItemName').value = currentName; // Pre-fill with current name
     } else if (modalId === 'deleteModal') {
         document.getElementById('deleteItemPath').value = path;
+        // Optionally display the item name in the modal confirmation text
+        const itemNameDisplay = document.getElementById('deleteItemNameDisplay');
+        if (itemNameDisplay) {
+             itemNameDisplay.textContent = `"${path.split('/').pop()}"`;
+        }
     } else if (modalId === 'appendModal') {
         document.getElementById('appendFilePath').value = path;
-        updateAppendModalContent(path); // Actualizar el contenido actual
-    } else if (modalId === 'createDirModal' || modalId === 'createFileModal') {
-        document.getElementById(`${modalId === 'createDirModal' ? 'createDirPath' : 'createFilePath'}`).value = path;
-    }
-    
-    modal.show();
+        updateAppendModalContent(path); // Load and display current content for append
+    } 
+    // Note: createDirModal and createFileModal paths are set via the 'show.bs.modal' listener
+
+    // Bootstrap's data-bs-toggle handles showing the modal,
+    // but calling modal.show() here is fine if you trigger it via JS click.
+    // If using data-bs-toggle in HTML, this function primarily sets the data.
+    // modal.show(); // Removed to rely on data-bs-toggle from HTML buttons
 }
 
-// Función para buscar archivos
+// Function to handle file search
 let searchTimeout;
 
 async function searchFiles() {
     const searchTerm = document.getElementById('searchInput').value.trim();
-    const currentPath = document.getElementById('currentPath').textContent.replace('data/', '');
+    // Get the current path from the displayed element
+    const currentPathDisplay = document.getElementById('currentPath').textContent;
+    // Extract the relative path by removing "data/" prefix
+    const currentPath = currentPathDisplay.startsWith('data/') ? currentPathDisplay.substring(5) : '';
     
-    // Limpiar el timeout anterior si existe
+    // Clear previous timeout if user is typing quickly
     if (searchTimeout) {
         clearTimeout(searchTimeout);
     }
     
-    // Si el término de búsqueda está vacío, volver a mostrar el contenido normal
+    // If search term is empty, load the current directory content instead
     if (searchTerm.length === 0) {
         loadDirectoryContent(currentPath);
         return;
     }
 
-    // Asegurar que la ruta está correctamente formateada
+    // Format path for the API request (remove leading/trailing slashes if any)
     const formattedPath = currentPath ? currentPath.replace(/^\/|\/$/g, '') : '';
     
-    // Mostrar indicador de carga
+    // Show a loading indicator in the browser content area
     const browserContent = document.getElementById('browser-content');
-    browserContent.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Buscando...</span></div></div>';
+    browserContent.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Buscando...</span>
+            </div>
+            <p class="mt-2">Buscando "${escapeHTML(searchTerm)}"...</p>
+        </div>
+    `;
 
-    // Agregar un delay de 300ms para evitar búsquedas innecesarias
+    // Add a small delay before searching to avoid excessive requests
     searchTimeout = setTimeout(async () => {
         try {
+            // Perform the search API call
             const response = await fetch(`/api/search?term=${encodeURIComponent(searchTerm)}&path=${encodeURIComponent(formattedPath)}`);
             const data = await response.json();
             
             if (data.success) {
+                // Display search results
                 displaySearchResults(data.results, searchTerm);
+                 // showAlert('success', data.message); // Optional alert for search results count
             } else {
+                // Show error message from backend and revert to current directory view
                 showAlert('danger', data.message || 'Error en la búsqueda');
                 loadDirectoryContent(formattedPath);
             }
         } catch (error) {
-            console.error('Error:', error);
-            showAlert('danger', 'Error al realizar la búsqueda');
+            console.error('Error al realizar la búsqueda:', error);
+            // Show a generic error message
+            showAlert('danger', 'Error de conexión o del servidor', 
+                'No se pudo realizar la búsqueda. Por favor, verifica la consola para más detalles.');
+            // Revert to current directory view on error
             loadDirectoryContent(formattedPath);
         }
-    }, 300);
+    }, 300); // 300ms delay
 }
 
-// Función para mostrar los resultados de búsqueda
+// Function to display search results in the browser content area
 function displaySearchResults(results, searchTerm) {
     const browserContent = document.getElementById('browser-content');
-    
+    browserContent.innerHTML = ''; // Clear previous content
+
     if (results.length === 0) {
         browserContent.innerHTML = `
             <div class="text-center py-4">
                 <i class="bi bi-search" style="font-size: 2rem;"></i>
-                <h5 class="mt-3">No se encontraron resultados para "${searchTerm}"</h5>
-                <button class="btn btn-primary mt-3" onclick="loadDirectoryContent()">
+                <h5 class="mt-3">No se encontraron resultados para "${escapeHTML(searchTerm)}"</h5>
+                <button class="btn btn-primary mt-3" onclick="loadDirectoryContent('')">
                     <i class="bi bi-arrow-left"></i> Volver al explorador
                 </button>
             </div>
@@ -259,102 +332,131 @@ function displaySearchResults(results, searchTerm) {
     let html = `
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h5><i class="bi bi-search me-2"></i>Resultados para "${searchTerm}"</h5>
-                <p class="text-muted">${results.length} elementos encontrados</p>
+                <h5><i class="bi bi-search me-2"></i>Resultados para "${escapeHTML(searchTerm)}"</h5>
+                <p class="text-muted small">${results.length} elementos encontrados</p>
             </div>
-            <button class="btn btn-outline-secondary" onclick="loadDirectoryContent()">
+            <button class="btn btn-outline-secondary btn-sm" onclick="loadDirectoryContent('')">
                 <i class="bi bi-arrow-left"></i> Volver
             </button>
         </div>
-        <ul class="list-group">
-    `;
+        <div class="list-group"> `;
 
     results.forEach(item => {
         const icon = item.is_dir ? 'bi-folder-fill text-warning' : 'bi-file-earmark-fill text-primary';
+        // Determine the action when clicking the item based on type
+        const itemClickAction = item.is_dir ? `loadDirectoryContent('${item.path}')` : `previewFile('${item.path}')`;
         
         html += `
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
+            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center flex-grow-1 text-start" onclick="${itemClickAction}">
                     <i class="bi ${icon} me-2"></i>
-                    <span class="item-name">${highlightMatches(item.name, searchTerm)}</span>
+                    <span class="item-name">${highlightMatches(escapeHTML(item.name), escapeHTML(searchTerm))}</span>
                     <small class="text-muted ms-2">${item.path}</small>
                 </div>
-                <div class="btn-group">
-                    ${item.is_dir ? 
-                        `<button class="btn btn-sm btn-outline-secondary" onclick="loadDirectoryContent('${item.path}')">
-                            <i class="bi bi-folder2-open"></i> Abrir
-                        </button>` : 
-                        `<button class="btn btn-sm btn-outline-primary" onclick="previewFile('${item.path}')">
-                            <i class="bi bi-eye"></i> Ver
-                        </button>`
+                <div class="btn-group btn-group-sm" role="group" onclick="event.stopPropagation()"> ${item.is_file ? 
+                        `<button type="button" class="btn btn-outline-secondary" onclick="setModalPath('appendModal', '${item.path}')" title="Agregar Contenido">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>` : ''
                     }
-                    <button class="btn btn-sm btn-outline-secondary" onclick="setModalPath('renameModal', '${item.path}', '${item.name}')">
+                    <button type="button" class="btn btn-outline-secondary" onclick="setModalPath('renameModal', '${item.path}', '${item.name}')" title="Renombrar">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="setModalPath('deleteModal', '${item.path}')">
+                    <button type="button" class="btn btn-outline-danger" onclick="setModalPath('deleteModal', '${item.path}')" title="Eliminar">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
-            </li>
+            </button>
         `;
     });
 
-    html += `</ul>`;
+    html += `</div>`; // Close list-group
     browserContent.innerHTML = html;
 }
 
-// Función para resaltar coincidencias en los resultados
+// Function to highlight search term matches in item names
 function highlightMatches(text, searchTerm) {
     if (!searchTerm) return text;
-    
+    // Use a regular expression to find all occurrences of the search term (case-insensitive)
     const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
-    return text.replace(regex, '<span class="bg-warning">$1</span>');
+    // Replace matches with the same text wrapped in a highlight span
+    return text.replace(regex, '<span class="bg-warning text-dark rounded-1 px-1">$1</span>');
 }
 
-// Función para escapar caracteres especiales en regex
+// Helper function to escape special characters for use in a regular expression
 function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
-// Manejadores de eventos para los formularios
+// --- Form Submission Handlers ---
+
+// Handle Create Directory Form Submission
 document.getElementById('createDirForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const path = document.getElementById('createDirPath').value || '';
-    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : '';
-    const name = document.getElementById('createDirName').value;
+    e.preventDefault(); // Prevent default form submission
+    // console.log('Evento submit de createDirForm activado!'); // Para verificar
     
+    const path = document.getElementById('createDirPath').value || ''; // Get parent path from modal input
+    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : ''; // Clean up path format
+    const name = document.getElementById('createDirName').value.trim(); // Get new directory name
+
+    if (!name) {
+         showAlert('danger', 'El nombre de la carpeta no puede estar vacío.');
+         return;
+    }
+    
+    // console.log('Carga de solicitud para crear directorio:', { path: formattedPath, name }); // Para verificar
+
     try {
-        const response = await fetch('/api/create_directory', {
+        // Send POST request to the backend API
+        const response = await fetch('/api/create_dir', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ path: formattedPath, name }),
         });
-        const data = await response.json();
+        const data = await response.json(); // Parse JSON response
+        // console.log('Respuesta de /api/create_dir:', data); // Para verificar
         
         if (data.success) {
+            // console.log('Directorio creado exitosamente, mostrando alerta.'); // Para verificar
+            // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('createDirModal'));
             modal.hide();
+            // Reload the current directory content to show the new folder
             loadDirectoryContent(formattedPath);
-            showAlert('success', 'Directorio creado correctamente');
+            // Show success message from the backend
+            showAlert('success', data.message); 
         } else {
+            // console.log('Fallo al crear directorio, mostrando alerta de error.'); // Para verificar
+            // Show error message from the backend
             showAlert('danger', data.message || 'Error al crear el directorio');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al crear el directorio');
+        console.error('Error al crear directorio:', error); // Log error to console
+        // Show a generic error message for network/server issues
+        showAlert('danger', 'Error de conexión o del servidor', error.message || 'No se pudo crear la carpeta.');
     }
 });
 
+// Handle Create File Form Submission
 document.getElementById('createFileForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const path = document.getElementById('createFilePath').value || '';
-    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : '';
-    const name = document.getElementById('createFileName').value;
-    const content = document.getElementById('createFileContent').value;
+    e.preventDefault(); // Prevent default form submission
+    // console.log('Evento submit de createFileForm activado!'); //Para verificar
+
+    const path = document.getElementById('createFilePath').value || ''; // Get parent path from modal input
+    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : ''; // Clean up path format
+    const name = document.getElementById('createFileName').value.trim(); // Get new file name
+    const content = document.getElementById('createFileContent').value; // Get file content
+
+    if (!name) {
+         showAlert('danger', 'El nombre del archivo no puede estar vacío.');
+         return;
+    }
     
+    // console.log('Carga de solicitud para crear archivo:', { path: formattedPath, name, content }); // Para verificar
+
     try {
+        // Send POST request to the backend API
         const response = await fetch('/api/create_file', {
             method: 'POST',
             headers: {
@@ -362,29 +464,48 @@ document.getElementById('createFileForm').addEventListener('submit', async (e) =
             },
             body: JSON.stringify({ path: formattedPath, name, content }),
         });
-        const data = await response.json();
-        
+        const data = await response.json(); // Parse JSON response
+        // console.log('Respuesta de /api/create_file:', data); //Para verificar
+
         if (data.success) {
+            // console.log('Archivo creado exitosamente, mostrando alerta.'); //Para verificar
+            // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('createFileModal'));
             modal.hide();
+            // Reload the current directory content to show the new file
             loadDirectoryContent(formattedPath);
-            showAlert('success', 'Archivo creado correctamente');
+            // Show success message from the backend
+            showAlert('success', data.message); 
         } else {
+            // console.log('Fallo al crear archivo, mostrando alerta de error.'); //Para verificar
+            // Show error message from the backend
             showAlert('danger', data.message || 'Error al crear el archivo');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al crear el archivo');
+        console.error('Error al crear archivo:', error); // Log error to console
+        // Show a generic error message for network/server issues
+        showAlert('danger', 'Error de conexión o del servidor', error.message || 'No se pudo crear el archivo.');
     }
 });
 
+// Handle Append File Form Submission
 document.getElementById('appendFileForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const path = document.getElementById('appendFilePath').value || '';
-    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : '';
-    const content = document.getElementById('appendFileContent').value;
+    e.preventDefault(); // Prevent default form submission
+    // console.log('Evento submit de appendFileForm activado!'); // Para verificar
+
+    const path = document.getElementById('appendFilePath').value || ''; // Get file path from modal input
+    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : ''; // Clean up path format
+    const content = document.getElementById('appendFileContent').value; // Get content to append
+
+    if (!content.trim()) {
+         showAlert('danger', 'El contenido a agregar no puede estar vacío.');
+         return;
+    }
     
+    // console.log('Carga de solicitud para añadir contenido:', { path: formattedPath, content }); // Para verificar
+
     try {
+        // Send POST request to the backend API
         const response = await fetch('/api/append_file', {
             method: 'POST',
             headers: {
@@ -392,64 +513,98 @@ document.getElementById('appendFileForm').addEventListener('submit', async (e) =
             },
             body: JSON.stringify({ path: formattedPath, content }),
         });
-        const data = await response.json();
+        const data = await response.json(); // Parse JSON response
+        // console.log('Respuesta de /api/append_file:', data); // Para verificar
         
         if (data.success) {
+            // console.log('Contenido añadido exitosamente, mostrando alerta.'); // Para verificar
+            // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('appendModal'));
             modal.hide();
-            loadDirectoryContent(formattedPath.split('/').slice(0, -1).join('/'));
-            showAlert('success', 'Contenido agregado correctamente');
+            // Reload the parent directory content (or the file itself if you implement that)
+            const parentPath = formattedPath.split('/').slice(0, -1).join('/');
+            loadDirectoryContent(parentPath); 
+            // Show success message from the backend
+            showAlert('success', data.message); 
         } else {
+            // console.log('Fallo al añadir contenido, mostrando alerta de error.'); // Para verificar
+            // Show error message from the backend
             showAlert('danger', data.message || 'Error al agregar contenido');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al agregar contenido');
+        console.error('Error al añadir contenido:', error); // Log error to console
+        // Show a generic error message for network/server issues
+        showAlert('danger', 'Error de conexión o del servidor', error.message || 'No se pudo agregar el contenido.');
     }
 });
 
+// Handle Delete Item Form Submission
 document.getElementById('deleteItemForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const path = document.getElementById('deleteItemPath').value || '';
-    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : '';
-    const itemName = path.split('/').pop();
+    e.preventDefault(); // Prevent default form submission
+    // console.log('Evento submit de deleteItemForm activado!'); // Para verificar
+
+    const path = document.getElementById('deleteItemPath').value || ''; // Get item path from modal input
+    const formattedPath = path ? path.replace(/^\/|\/$/g, '') : ''; // Clean up path format
+    // const itemName = path.split('/').pop(); // Item name can be obtained from backend message
+
+    if (!path) {
+         showAlert('danger', 'No se especificó ningún item para eliminar.');
+         return;
+    }
     
+    // console.log('Carga de solicitud para eliminar item:', { path: formattedPath }); // Para verificar
+
     try {
-        const response = await fetch('/api/delete_item', {
+        // Send POST request to the backend API
+        const response = await fetch('/api/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ path: formattedPath }),
         });
-        const data = await response.json();
+        const data = await response.json(); // Parse JSON response
+        // console.log('Respuesta de /api/delete:', data); //Para verificar
         
         if (data.success) {
+            // console.log('Elemento eliminado exitosamente, mostrando alerta.'); //Para verificar
+            // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
             modal.hide();
+            // Reload the parent directory content
             const parentPath = formattedPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath);
-            showAlert('success', `"${itemName}" eliminado correctamente`);
+            // Show success message from the backend
+            showAlert('success', data.message); 
         } else {
+            // console.log('Fallo al eliminar elemento, mostrando alerta de error.'); //Para verificar
+            // Show error message from the backend
             showAlert('danger', data.message || 'Error al eliminar el item');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al eliminar el item');
+        console.error('Error al eliminar elemento:', error); // Log error to console
+        // Show a generic error message for network/server issues
+        showAlert('danger', 'Error de conexión o del servidor', error.message || 'No se pudo eliminar el item.');
     }
 });
 
+// Handle Rename Item Form Submission
 document.getElementById('renameItemForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const oldPath = document.getElementById('renameItemPath').value.trim();
-    const newName = document.getElementById('renameItemName').value.trim();
+    e.preventDefault(); // Prevent default form submission
+    // console.log('Evento submit de renameItemForm activado!'); // Para verificar
+
+    const oldPath = document.getElementById('renameItemPath').value.trim(); // Get old path from modal input
+    const newName = document.getElementById('renameItemName').value.trim(); // Get new name from modal input
     
+    // console.log('Carga de solicitud para renombrar item:', { oldPath: oldPath, newName: newName }); // Para verificar
+
     if (!oldPath || !newName) {
         showAlert('danger', 'Por favor, ingrese una ruta y un nuevo nombre');
         return;
     }
 
     try {
+        // Send POST request to the backend API
         const response = await fetch('/api/rename_item', {
             method: 'POST',
             headers: {
@@ -460,41 +615,86 @@ document.getElementById('renameItemForm').addEventListener('submit', async (e) =
                 newName: newName
             }),
         });
-        const data = await response.json();
+        const data = await response.json(); // Parse JSON response
+        // console.log('Respuesta de /api/rename_item:', data); // Para verificar
         
         if (data.success) {
+            // console.log('Elemento renombrado exitosamente, mostrando alerta.'); // Para verificar
+            // Hide the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
             modal.hide();
+            // Reload the parent directory content
             const parentPath = oldPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath);
-            showAlert('success', data.message);
+            // Show success message from the backend
+            showAlert('success', data.message); 
         } else {
+            // console.log('Fallo al renombrar elemento, mostrando alerta de error.'); // Para verificar
+            // Show error message from the backend
             showAlert('danger', data.message || 'Error al renombrar');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showAlert('danger', 'Error al renombrar');
+        console.error('Error al renombrar:', error); // Log error to console
+        // Show a generic error message for network/server issues
+        showAlert('danger', 'Error de conexión o del servidor', error.message || 'No se pudo renombrar el item.');
     }
 });
 
-// Inicializar el explorador cuando se carga la página
+
+// --- Initialization ---
+
+// Initialize the file browser and set up event listeners when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Configurar el buscador
+    // Set up the search input listener
     document.getElementById('searchInput').addEventListener('input', function() {
+        // Clear previous timeout and set a new one for delayed search
         clearTimeout(window.searchTimeout);
-        window.searchTimeout = setTimeout(searchFiles, 300);
+        window.searchTimeout = setTimeout(searchFiles, 300); // Search after 300ms of inactivity
     });
     
-    // Cargar el directorio raíz
+    // Load the initial directory content (root 'data' directory)
     loadDirectoryContent();
     
-    // Configurar los modales para que limpien los formularios al cerrarse
+    // Configure modals to clear their forms and set path inputs when shown/hidden
     ['createDirModal', 'createFileModal', 'appendModal', 'deleteModal', 'renameModal'].forEach(modalId => {
-        document.getElementById(modalId).addEventListener('hidden.bs.modal', function() {
-            const form = this.querySelector('form');
-            if (form) {
-                form.reset();
-            }
-        });
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            // Add listener for when the modal is about to be shown
+            modalElement.addEventListener('show.bs.modal', function() {
+                // Get the current path from the displayed element
+                const currentPathDisplay = document.getElementById('currentPath').textContent;
+                // Extract the relative path by removing "data/" prefix
+                const currentPath = currentPathDisplay.startsWith('data/') ? currentPathDisplay.substring(5) : '';
+
+                // Set the parent path in the creation modals
+                if (modalId === 'createDirModal') {
+                    document.getElementById('createDirPath').value = currentPath || '/'; // Use '/' for root display in modal
+                } else if (modalId === 'createFileModal') {
+                    document.getElementById('createFilePath').value = currentPath || '/'; // Use '/' for root display in modal
+                }
+                // For appendModal, renameModal, deleteModal, the path is set by setModalPath when clicking the item button.
+                // We might need to call setModalPath here if modals are opened *without* clicking an item button,
+                // but based on the HTML structure, they are opened by item buttons or the main New Dir/File buttons.
+                // The main New Dir/File buttons (if they existed) would call setModalPath.
+                // With data-bs-toggle, the 'show.bs.modal' is the place to set the path for creation modals.
+            });
+
+             // Add listener for when the modal is hidden
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                const form = this.querySelector('form');
+                if (form) {
+                    form.reset(); // Reset the form fields
+                }
+                 // Clear file preview in append modal
+                if (modalId === 'appendModal') {
+                     const previewArea = document.getElementById('appendFileContentPreview');
+                     if (previewArea) {
+                         previewArea.value = '';
+                     }
+                }
+            });
+        } else {
+            console.warn(`Modal element with ID "${modalId}" not found.`);
+        }
     });
 });

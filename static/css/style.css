@@ -1,67 +1,145 @@
-/* Estilos generales */
+/* Estilos generales para el cuerpo */
 body {
-    background-color: #f8f9fa;
+    background-color: #f8f9fa; /* Fondo gris claro */
+    font-family: 'Arial', sans-serif; /* Fuente legible */
+    line-height: 1.6;
 }
 
+/* Estilos para el contenedor principal de Bootstrap */
 .container {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    /* Bootstrap's .container provides centering and max-width */
+    /* Add some vertical margin */
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Estilos para el breadcrumb */
-.breadcrumb {
-    background-color: transparent;
-    padding: 0.5rem 0;
+/* Estilos para la tarjeta principal que envuelve todo */
+.card {
+    /* Bootstrap's .card provides background and some styling */
+    border: none; /* Remove default card border */
 }
 
-.breadcrumb-item {
-    color: #6c757d;
+/* Estilos para la cabecera de la tarjeta (donde está el título y buscador) */
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Add a subtle border below header */
 }
 
-.breadcrumb-item.active {
-    color: #007bff;
-    font-weight: 500;
+/* Estilos para el cuerpo de la tarjeta (contiene sidebar, browser, preview) */
+.card-body {
+    /* Remove default card body padding if row g-0 is used on direct children */
+    padding: 0; 
 }
 
-/* Estilos para los iconos */
-.bi {
-    margin-right: 0.5rem;
+/* Estilos para los elementos de la lista del explorador (usando list-group) */
+#browser-content .list-group-item {
+    border: none; /* Remove default list-group-item borders */
+    border-bottom: 1px solid #eee; /* Add a light border between items */
+    padding: 0.75rem 1.25rem; /* Add padding */
+    cursor: pointer; /* Indicate clickable items */
+    transition: background-color 0.2s ease; /* Smooth hover effect */
 }
 
-/* Estilos para los enlaces */
-a {
-    color: #007bff;
-    text-decoration: none;
-    transition: color 0.3s ease;
+#browser-content .list-group-item:last-child {
+    border-bottom: none; /* No border on the last item */
 }
 
-a:hover {
-    color: #0056b3;
-    text-decoration: underline;
+#browser-content .list-group-item:hover {
+    background-color: #f8f9fa; /* Light background on hover */
 }
 
-/* Estilos para el explorador */
-#browser-content {
-    min-height: 300px;
-    padding: 1rem;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+/* Estilos para los iconos dentro de los items */
+#browser-content .list-group-item i.bi {
+    font-size: 1.1rem; /* Slightly larger icons */
+    width: 1.5rem; /* Fixed width for alignment */
+    text-align: center;
 }
 
-/* Estilos para los mensajes flash */
+/* Estilos para el área de previsualización */
+#file-preview {
+    /* Ensure it takes available height and has a background */
+    background-color: #e9ecef; /* Light grey background for preview area */
+    border-radius: 0.25rem; /* Rounded corners */
+    font-family: 'Courier New', monospace; /* Monospace font for code/text */
+    white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+    word-wrap: break-word; /* Break long words */
+    font-size: 0.9rem; /* Slightly smaller font for content */
+    color: #333; /* Darker text color */
+    padding: 1rem; /* Add padding */
+    min-height: 150px; /* Minimum height */
+}
+
+#file-preview pre {
+    margin: 0; /* Remove default pre margin */
+    border: none; /* Remove default pre border */
+    background-color: transparent; /* Transparent background */
+    padding: 0; /* Remove default pre padding */
+}
+
+
+/* Estilos para la barra lateral de acciones */
+.list-group-flush .list-group-item {
+    border-width: 0 0 1px 0; /* Only bottom border */
+    padding: 0.75rem 1.25rem;
+}
+
+.list-group-flush .list-group-item:last-child {
+    border-bottom-width: 0;
+}
+
+.list-group-item-action:hover {
+    color: #007bff; /* Bootstrap primary color */
+    background-color: #e9ecef; /* Light grey background on hover */
+}
+
+/* Ajustes para grupos de botones pequeños */
+.btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem; /* Smaller padding for small buttons */
+    font-size: 0.875rem; /* Smaller font size */
+    line-height: 1.5;
+    border-radius: 0.2rem; /* Smaller border-radius */
+}
+
+/* Estilos para los mensajes flash (Bootstrap alerts) */
 .alert {
-    margin-bottom: 1rem;
-    border-radius: 5px;
+    margin-top: 1rem; /* Add space above alerts */
+    margin-bottom: 1rem; /* Add space below alerts */
+    border-radius: 0.25rem; /* Standard Bootstrap border-radius */
 }
 
-.alert-success {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
+/* Ensure flex items in row take full height */
+.row.g-0 > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
 }
 
-.alert-danger {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
+.row.g-0 .h-100 {
+    flex-grow: 1; /* Allow content areas to grow */
 }
+
+/* Style for the search term highlight */
+.bg-warning {
+    background-color: #ffc107 !important; /* Bootstrap warning yellow */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column; /* Stack header items on small screens */
+        align-items: stretch !important;
+    }
+    .card-header .d-flex.align-items-center {
+        margin-bottom: 0.5rem; /* Add space between stacked items */
+    }
+    .card-header .input-group {
+        margin-bottom: 0.5rem;
+    }
+    .col-md-3.border-end {
+        border-right: none !important; /* Remove vertical border on small screens */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Add horizontal border */
+    }
+     .col-md-8.border-end {
+        border-right: none !important; /* Remove vertical border on small screens */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Add horizontal border */
+    }
+}
+
