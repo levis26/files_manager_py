@@ -1,18 +1,15 @@
 import os
 import shutil
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
-from flask_bootstrap import Bootstrap # Assuming Bootstrap is still desired, though not strictly needed for the pure API endpoints
+# from flask_bootstrap import Bootstrap # Comentado, ya que no es estrictamente necesario para la API
 
 # --- Anticopy Placeholder ---
-# This string serves as a basic, easily identifiable marker.
-# A real "anticopy" system is far more complex and would involve unique
-# implementation details, code style, and logic flow.
 PROJECT_ID = "SimpleFileManager_RenameFeature_ABC123_20250503"
 # ---------------------------
 
 app = Flask(__name__)
-# Bootstrap(app) # Bootstrap extension is not strictly needed for API endpoints
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/' # Secret key for flashing messages (though we primarily use JS alerts)
+# Bootstrap(app) # Comentado
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/' # Clave secreta para mensajes flash (aunque usamos principalmente alertas JS)
 
 # Define the data directory path relative to the application file
 DATA_DIR = 'data'
@@ -181,35 +178,39 @@ def create_directory():
     API endpoint to create a new directory.
     """
     data = request.get_json()
-    path = data.get('path', '') # This is the parent directory path
+    path = data.get('path', '') # This is the parent directory path (can be "")
     name = data.get('name', '') # This is the new directory name
 
-    if not path or not name:
+    # --- MODIFICACIÓN AQUÍ: Permitir path vacío para la raíz ---
+    if not name: # Only require name to be non-empty
         return jsonify({
             'success': False,
-            'message': 'Path and name are required'
+            'message': 'Name is required' # Changed message for clarity
         })
 
     # Construct the full path for the new directory
     new_dir_relative_path = os.path.join(path, name)
     full_path = get_full_path(new_dir_relative_path)
     
-    # get_full_path validates security. We now check if the parent exists.
-    # The parent path is the 'path' received from the frontend.
+    # Check if the parent directory is valid and exists
+    # If path is "", get_full_path("") returns the absolute DATA_DIR.
     full_parent_path = get_full_path(path)
 
+    # Ensure the parent path is valid and is a directory
     if not full_parent_path or not os.path.isdir(full_parent_path):
          return jsonify({
             'success': False,
             'message': 'Invalid parent directory path or parent does not exist'
         })
 
-    if not full_path: # get_full_path failed for the new path itself (e.g., invalid characters in name)
+    # Check if the full path for the new directory is valid (within DATA_DIR)
+    if not full_path:
          return jsonify({
             'success': False,
-            'message': 'Invalid new directory name'
+            'message': 'Invalid new directory name or path'
         })
 
+    # Check if an item with the same name already exists at the target location
     if os.path.exists(full_path):
         return jsonify({
             'success': False,
@@ -235,14 +236,15 @@ def create_file():
     API endpoint to create a new file.
     """
     data = request.get_json()
-    path = data.get('path', '') # This is the parent directory path
+    path = data.get('path', '') # This is the parent directory path (can be "")
     name = data.get('name', '') # This is the new file name
     content = data.get('content', '')
 
-    if not path or not name:
+    # --- MODIFICACIÓN AQUÍ: Permitir path vacío para la raíz ---
+    if not name: # Only require name to be non-empty
         return jsonify({
             'success': False,
-            'message': 'Path and name are required'
+            'message': 'Name is required' # Changed message for clarity
         })
 
     # Construct the full path for the new file
@@ -257,12 +259,14 @@ def create_file():
             'message': 'Invalid parent directory path or parent does not exist'
         })
 
-    if not full_path: # get_full_path failed for the new path itself
+    # Check if the full path for the new file is valid (within DATA_DIR)
+    if not full_path:
          return jsonify({
             'success': False,
-            'message': 'Invalid new file name'
+            'message': 'Invalid new file name or path'
         })
 
+    # Check if an item with the same name already exists at the target location
     if os.path.exists(full_path):
         return jsonify({
             'success': False,
@@ -450,7 +454,7 @@ def rename_item():
                 'message': f'El archivo/directorio "{old_path}" no existe'
             })
 
-        # Check if the new path is valid (within DATA_DIR)
+        # Check if the full path for the new name is valid (within DATA_DIR)
         if not full_new_path:
              return jsonify({
                 'success': False,
@@ -465,16 +469,8 @@ def rename_item():
             })
 
         # --- This check is now redundant because we constructed new_path_in_same_dir ---
-        # old_parent_abs = os.path.dirname(full_old_path)
-        # new_parent_abs = os.path.dirname(full_new_path)
-        # if old_parent_abs != new_parent_abs:
-        #     return jsonify({
-        #         'success': False,
-        #         'message': 'No se puede mover el archivo/directorio a un directorio diferente. Solo se permite renombrar en la misma ubicación.'
-        #     })
-        # --- Keeping the check for clarity, but it should always be true now ---
+        # Keeping the check as a safeguard, though it should always be true now
         if os.path.dirname(full_old_path) != os.path.dirname(full_new_path):
-             # This case should ideally not be hit with the current logic, but as a safeguard:
              print(f"SECURITY ALERT: Attempted rename across directories: {full_old_path} to {full_new_path}")
              return jsonify({
                 'success': False,
