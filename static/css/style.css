@@ -74,13 +74,21 @@ body {
     color: #333; /* Darker text color */
     padding: 1rem; /* Add padding */
     min-height: 150px; /* Minimum height */
+    /* Ensure flex properties align content correctly when it's empty or has error */
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Estilos para el bloque <pre> dentro de la previsualización normal */
 #file-preview pre {
     margin: 0; /* Remove default pre margin */
     border: none; /* Remove default pre border */
     background-color: transparent; /* Transparent background */
     padding: 0; /* Remove default pre padding */
+    flex-grow: 1; /* Allow pre to take available space */
+    width: 100%; /* Ensure pre takes full width of its container */
 }
 
 
@@ -103,7 +111,7 @@ body {
 .list-group-item-action:disabled {
     opacity: 0.5; /* Reduce opacity */
     cursor: not-allowed; /* Show not-allowed cursor */
-    pointer-events: auto; /* Allow click event to be captured for showing alert */
+    /* pointer-events: auto; */ /* Allow click event to be captured for showing alert - handled in JS now */
 }
 
 /* Estilos para grupos de botones pequeños */
@@ -135,6 +143,26 @@ body {
 .bg-warning {
     background-color: #ffc107 !important; /* Bootstrap warning yellow */
 }
+
+/* Estilos para el modal de previsualización maximizada */
+#previewModal .modal-body {
+    display: flex;
+    flex-direction: column;
+}
+
+#previewModal #previewModalFileContent {
+     background-color: #e9ecef; /* Consistent background */
+     border-radius: 0.25rem; /* Rounded corners */
+     font-family: 'Courier New', monospace; /* Monospace font */
+     white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+     word-wrap: break-word; /* Break long words */
+     font-size: 1rem; /* Slightly larger font in modal */
+     color: #333; /* Darker text color */
+     padding: 1rem; /* Add padding */
+     flex-grow: 1; /* Allow content to fill modal height */
+     overflow: auto; /* Add scroll if content overflows */
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

@@ -4,6 +4,9 @@ from flask import Flask, render_template, request, jsonify, flash, redirect, url
 # from flask_bootstrap import Bootstrap # Comentado, ya que no es estrictamente necesario para la API
 
 # --- Anticopy Placeholder ---
+# This string serves as a basic, easily identifiable marker.
+# A real "anticopy" system is far more complex and would involve unique
+# implementation details, code style, and logic flow.
 PROJECT_ID = "SimpleFileManager_RenameFeature_ABC123_20250503"
 # ---------------------------
 
@@ -400,7 +403,7 @@ def delete_item():
         print(f"Unexpected error deleting {full_path}: {e}")
         return jsonify({
             'success': False,
-            'message': str(e)
+            'message': f'Error inesperado: {str(e)}'
         })
 
 @app.route('/api/rename_item', methods=['POST'])
@@ -609,7 +612,6 @@ def search_files():
                         'is_file': False
                     })
             
-            # Search in file names
             for file_name in files:
                 if search_term in file_name.lower():
                     file_path = os.path.join(root, file_name)

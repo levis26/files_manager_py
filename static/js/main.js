@@ -2,6 +2,7 @@
 let selectedItemPath = null;
 let selectedItemIsFile = false;
 let selectedItemElement = null; // Reference to the currently selected DOM element
+let currentPreviewContent = null; // Global variable to store content for the modal
 
 // Function to show alerts with more details
 function showAlert(type, message, extraInfo = '') {
@@ -117,6 +118,11 @@ function selectItem(path, isFile, element) {
                     Selecciona un archivo para ver su contenido
                 </div>
             `;
+            // Hide maximize button
+            const maximizeBtn = document.getElementById('maximizePreviewBtn');
+            if (maximizeBtn) maximizeBtn.style.visibility = 'hidden';
+             // Clear stored content
+            currentPreviewContent = null;
         }
     }
 }
@@ -126,25 +132,34 @@ function clearSelection(event) {
     // Check if the click target is within an item element or a button within an item
     // If not, clear the selection
     const target = event.target;
-    const isItemElement = target.classList.contains('list-group-item');
-    const isButtonInItem = target.closest('.btn-group');
+    // Check if the click is inside the browser content area but not on an item or button group
+    const browserContent = document.getElementById('browser-content');
+    if (browserContent && browserContent.contains(target)) {
+        const isItemElement = target.closest('.list-group-item');
+        const isButtonInItem = target.closest('.btn-group');
 
-    if (!isItemElement && !isButtonInItem) {
-        if (selectedItemElement) {
-            selectedItemElement.classList.remove('list-group-item-primary');
-        }
-        selectedItemPath = null;
-        selectedItemIsFile = false;
-        selectedItemElement = null;
-        updateSidebarButtonStates(); // Disable action buttons
-         // Clear preview when selection is cleared
-        const previewDiv = document.getElementById('file-preview');
-        if (previewDiv) {
-             previewDiv.innerHTML = `
-                <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
-                    Selecciona un archivo para ver su contenido
-                </div>
-            `;
+        if (!isItemElement && !isButtonInItem) {
+            if (selectedItemElement) {
+                selectedItemElement.classList.remove('list-group-item-primary');
+            }
+            selectedItemPath = null;
+            selectedItemIsFile = false;
+            selectedItemElement = null;
+            updateSidebarButtonStates(); // Disable action buttons
+            // Clear preview when selection is cleared
+            const previewDiv = document.getElementById('file-preview');
+            if (previewDiv) {
+                    previewDiv.innerHTML = `
+                    <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                        Selecciona un archivo para ver su contenido
+                    </div>
+                `;
+                 // Hide maximize button
+                const maximizeBtn = document.getElementById('maximizePreviewBtn');
+                if (maximizeBtn) maximizeBtn.style.visibility = 'hidden';
+                 // Clear stored content
+                currentPreviewContent = null;
+            }
         }
     }
 }
@@ -161,6 +176,22 @@ async function loadDirectoryContent(path = '') {
         selectedItemIsFile = false;
         selectedItemElement = null;
         updateSidebarButtonStates(); // Disable action buttons
+
+        // Clear preview when changing directories
+        const previewDiv = document.getElementById('file-preview');
+        if (previewDiv) {
+                previewDiv.innerHTML = `
+                <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                    Selecciona un archivo para ver su contenido
+                </div>
+            `;
+             // Hide maximize button
+            const maximizeBtn = document.getElementById('maximizePreviewBtn');
+            if (maximizeBtn) maximizeBtn.style.visibility = 'hidden';
+             // Clear stored content
+            currentPreviewContent = null;
+        }
+
 
         // Construct the API URL with the encoded path
         const response = await fetch(`/api/browse?path=${encodeURIComponent(path)}`);
@@ -217,7 +248,7 @@ async function loadDirectoryContent(path = '') {
                         </button>
                     </div>
                 `;
-                 // Add click listener for item selection
+                 // Add click listener for item selection and directory navigation
                 itemElement.addEventListener('click', (event) => {
                      // Prevent selecting the item if a button within it was clicked
                      if (!event.target.closest('.btn-group')) {
@@ -254,40 +285,63 @@ async function previewFile(path) {
         const data = await response.json();
         
         const previewDiv = document.getElementById('file-preview');
+        const maximizeBtn = document.getElementById('maximizePreviewBtn');
+
         if (!previewDiv) {
              console.error("Elemento '#file-preview' no encontrado.");
              showAlert('danger', 'Error interno', 'No se encontró el panel de previsualización.');
+             if (maximizeBtn) maximizeBtn.style.visibility = 'hidden';
+             currentPreviewContent = null;
              return;
         }
 
         if (data.success) {
-            // Display the file path and content
+            // Store the content globally for the modal
+            currentPreviewContent = data.content;
+
+            // Display the file path and content in the normal preview area
             previewDiv.innerHTML = `
                 <div class="mb-2">
-                    <small class="text-muted">Ruta: ${path}</small>
+                    <small class="text-muted">Ruta: ${escapeHTML(path)}</small>
                 </div>
                 <pre class="bg-white p-2 rounded-3 overflow-auto flex-grow-1"><code>${escapeHTML(data.content)}</code></pre>
             `;
+            // Show the maximize button
+            if (maximizeBtn) maximizeBtn.style.visibility = 'visible';
+
             // showAlert('success', 'Archivo previsualizado correctamente', `Mostrando contenido de ${path}`); // Optional alert
         } else {
              // Display error message in the preview panel
              previewDiv.innerHTML = `
-                <div class="text-muted text-center py-5">
+                <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
                     <i class="bi bi-x-circle-fill text-danger fs-4 mb-2"></i>
                     <p>Error al cargar el archivo: ${data.message || 'Desconocido'}</p>
                 </div>
             `;
+            // Hide maximize button on error
+            if (maximizeBtn) maximizeBtn.style.visibility = 'hidden';
+            // Clear stored content on error
+            currentPreviewContent = null;
+
             showAlert('danger', 'Error al previsualizar el archivo', data.message || 'Por favor, intenta nuevamente');
         }
     } catch (error) {
         console.error('Error al previsualizar el archivo:', error);
          const previewDiv = document.getElementById('file-preview');
-         previewDiv.innerHTML = `
-            <div class="text-muted text-center py-5">
-                <i class="bi bi-x-circle-fill text-danger fs-4 mb-2"></i>
-                <p>Error de conexión o del servidor al previsualizar.</p>
-            </div>
-        `;
+         if (previewDiv) {
+             previewDiv.innerHTML = `
+                <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                    <i class="bi bi-x-circle-fill text-danger fs-4 mb-2"></i>
+                    <p>Error de conexión o del servidor al previsualizar.</p>
+                </div>
+            `;
+         }
+         // Hide maximize button on error
+        const maximizeBtn = document.getElementById('maximizePreviewBtn');
+        if (maximizeBtn) maximizeBtn.style.visibility = 'hidden';
+        // Clear stored content on error
+        currentPreviewContent = null;
+
         showAlert('danger', 'Error de conexión o del servidor', 
             'No se pudo previsualizar el archivo. Por favor, verifica la consola para más detalles.');
     }
@@ -461,7 +515,7 @@ function displaySearchResults(results, searchTerm) {
         
         html += `
             <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center flex-grow-1 text-start" onclick="${itemClickAction}">
+                <div class="d-flex align-items-center flex-grow-1 text-start">
                     <i class="bi ${icon} me-2"></i>
                     <span class="item-name">${highlightMatches(escapeHTML(item.name), escapeHTML(searchTerm))}</span>
                     <small class="text-muted ms-2">${item.path}</small>
@@ -769,7 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDirectoryContent();
     
     // Configure modals to clear their forms and set path inputs when shown/hidden
-    ['createDirModal', 'createFileModal', 'appendModal', 'deleteModal', 'renameModal'].forEach(modalId => {
+    ['createDirModal', 'createFileModal', 'appendModal', 'deleteModal', 'renameModal', 'previewModal'].forEach(modalId => {
         const modalElement = document.getElementById(modalId);
         if (modalElement) {
             // Add listener for when the modal is about to be shown
@@ -784,9 +838,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('createDirPath').value = currentPath || '/'; // Use '/' for root display in modal
                 } else if (modalId === 'createFileModal') {
                     document.getElementById('createFilePath').value = currentPath || '/'; // Use '/' for root display in modal
+                } else if (modalId === 'previewModal') {
+                    // When the preview modal is shown, populate its content area
+                    const previewModalFileContent = document.getElementById('previewModalFileContent');
+                    const previewModalFileName = document.getElementById('previewModalFileName');
+                    const previewModalFilePath = document.getElementById('previewModalFilePath');
+
+                    if (previewModalFileContent && previewModalFileName && previewModalFilePath) {
+                         // Use the globally stored content and selected item path
+                         previewModalFileContent.innerHTML = currentPreviewContent !== null ? escapeHTML(currentPreviewContent) : 'Error al cargar contenido.';
+                         previewModalFileName.textContent = selectedItemPath ? selectedItemPath.split('/').pop() : 'Archivo';
+                         previewModalFilePath.textContent = selectedItemPath || 'N/A';
+                    } else {
+                         console.error("Elementos del modal de previsualización no encontrados.");
+                         if (previewModalFileContent) previewModalFileContent.textContent = 'Error interno al preparar la previsualización.';
+                    }
                 }
-                // For appendModal, renameModal, deleteModal, the path is set by setModalPath when clicking the item button.
-                // We now handle sidebar button clicks separately below.
             });
 
              // Add listener for when the modal is hidden
@@ -802,23 +869,23 @@ document.addEventListener('DOMContentLoaded', () => {
                          previewArea.value = '';
                      }
                 }
-                 // Clear selection when any modal is closed
-                 if (selectedItemElement) {
-                    selectedItemElement.classList.remove('list-group-item-primary');
-                }
-                selectedItemPath = null;
-                selectedItemIsFile = false;
-                selectedItemElement = null;
-                updateSidebarButtonStates(); // Disable action buttons
-                // Clear preview when selection is cleared
-                const previewDiv = document.getElementById('file-preview');
-                if (previewDiv) {
-                        previewDiv.innerHTML = `
-                        <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
-                            Selecciona un archivo para ver su contenido
-                        </div>
-                    `;
-                }
+                 // Clear selection when any modal is closed (optional, but can help prevent accidental actions)
+                 // if (selectedItemElement) {
+                 //    selectedItemElement.classList.remove('list-group-item-primary');
+                // }
+                // selectedItemPath = null;
+                // selectedItemIsFile = false;
+                // selectedItemElement = null;
+                // updateSidebarButtonStates(); // Disable action buttons
+                // // Clear preview when selection is cleared
+                // const previewDiv = document.getElementById('file-preview');
+                // if (previewDiv) {
+                //         previewDiv.innerHTML = `
+                //         <div class="text-muted text-center py-5 d-flex align-items-center justify-content-center flex-grow-1">
+                //             Selecciona un archivo para ver su contenido
+                //         </div>
+                //     `;
+                // }
             });
         } else {
             console.warn(`Modal element with ID "${modalId}" not found.`);
@@ -859,7 +926,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebarAppendBtn.addEventListener('click', () => {
             if (selectedItemPath && selectedItemIsFile) {
                 setModalPath('appendModal', selectedItemPath); // Open modal and set path
-            } else {
+            } else if (selectedItemPath && !selectedItemIsFile) {
+                 showAlert('warning', 'No puedes agregar contenido a un directorio.');
+            }
+             else {
                 showAlert('warning', 'Por favor, selecciona un archivo para agregar contenido.');
             }
         });
@@ -891,6 +961,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
      } else { console.warn("Sidebar Rename button not found."); }
+
+     // Maximize Preview Button - requires a file to be previewed
+    const maximizePreviewBtn = document.getElementById('maximizePreviewBtn');
+    if (maximizePreviewBtn) {
+        maximizePreviewBtn.addEventListener('click', () => {
+            // Check if there is content to show (a file was successfully previewed)
+            if (currentPreviewContent !== null) {
+                 const previewModalElement = document.getElementById('previewModal');
+                 if (previewModalElement) {
+                     const modalInstance = bootstrap.Modal.getInstance(previewModalElement) || new bootstrap.Modal(previewModalElement);
+                     modalInstance.show(); // show.bs.modal listener will populate the content
+                 }
+            } else {
+                 showAlert('info', 'No hay contenido para maximizar.', 'Selecciona un archivo primero.');
+            }
+        });
+    } else { console.warn("Maximize Preview button not found."); }
 
 
     // Initialize sidebar button states (they start disabled)
