@@ -560,55 +560,80 @@ def delete_item():
     flash(f"Error: '{item_path}' not found or is not a file/directory.", "error")
 
     # If there was an error, redirect back to the form, preserving context
+@app.route('/api/rename_item', methods=['POST'])
 def rename_item():
     """
     API endpoint to rename a file or directory.
     """
-    data = request.get_json()
-    old_path = data.get('oldPath', '')
-    new_name = data.get('newName', '')
-
-    if not old_path or not new_name:
-        return jsonify({
-            'success': False,
-            'message': 'Path and new name are required'
-        })
-
-    # Obtener el directorio padre del archivo/directorio
-    parent_dir = os.path.dirname(old_path)
-    
-    # Construir la nueva ruta completa
-    new_path = os.path.join(parent_dir, new_name)
-
-    # Validar las rutas
-    full_old_path = get_full_path(old_path)
-    full_new_path = get_full_path(new_path)
-
-    if not full_old_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid original path'
-        })
-
-    if not full_new_path:
-        return jsonify({
-            'success': False,
-            'message': 'Invalid new path'
-        })
-
     try:
+        # Obtener los datos del request
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'Datos no válidos'
+            })
+
+        old_path = data.get('oldPath', '').strip()
+        new_name = data.get('newName', '').strip()
+
+        # Validar que ambos campos estén presentes
+        if not old_path or not new_name:
+            return jsonify({
+                'success': False,
+                'message': 'Por favor, ingrese una ruta y un nuevo nombre'
+            })
+
+        # Verificar que el nuevo nombre no está vacío
+        if not new_name.strip():
+            return jsonify({
+                'success': False,
+                'message': 'El nuevo nombre no puede estar vacío'
+            })
+
+        # Obtener el directorio padre del archivo/directorio
+        parent_dir = os.path.dirname(old_path)
+        
+        # Construir la nueva ruta completa
+        new_path = os.path.join(parent_dir, new_name)
+
+        # Validar las rutas
+        full_old_path = get_full_path(old_path)
+        full_new_path = get_full_path(new_path)
+
+        if not full_old_path:
+            return jsonify({
+                'success': False,
+                'message': f'Ruta inválida: {old_path}'
+            })
+
+        if not full_new_path:
+            return jsonify({
+                'success': False,
+                'message': f'Ruta inválida: {new_path}'
+            })
+
         # Verificar si el archivo/directorio original existe
         if not os.path.exists(full_old_path):
             return jsonify({
                 'success': False,
-                'message': 'Original item not found'
+                'message': f'El archivo/directorio "{old_path}" no existe'
             })
 
         # Verificar si el nuevo nombre ya existe
         if os.path.exists(full_new_path):
             return jsonify({
                 'success': False,
-                'message': 'An item with this name already exists'
+                'message': f'Ya existe un archivo/directorio con el nombre "{new_name}"'
+            })
+
+        # Verificar si estamos intentando mover el item a un directorio diferente
+        old_parent = os.path.dirname(full_old_path)
+        new_parent = os.path.dirname(full_new_path)
+        if old_parent != new_parent:
+            return jsonify({
+                'success': False,
+                'message': 'No se puede mover el archivo/directorio a un directorio diferente'
             })
 
         # Realizar el renombrado
@@ -616,17 +641,17 @@ def rename_item():
 
         return jsonify({
             'success': True,
-            'message': 'Item renamed successfully'
+            'message': f'Renombrado exitosamente "{old_path}" a "{new_name}"'
         })
     except OSError as e:
         return jsonify({
             'success': False,
-            'message': f'Error renaming item: {str(e)}'
+            'message': f'Error al renombrar: {str(e)}'
         })
     except Exception as e:
         return jsonify({
             'success': False,
-            'message': f'An unexpected error occurred: {str(e)}'
+            'message': f'Error inesperado: {str(e)}'
         })
 
 @app.route('/rename_item', methods=['GET', 'POST'])

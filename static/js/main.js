@@ -394,8 +394,8 @@ document.getElementById('deleteItemForm').addEventListener('submit', async (e) =
 
 document.getElementById('renameItemForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const oldPath = document.getElementById('renameItemPath').value;
-    const newName = document.getElementById('renameItemName').value;
+    const oldPath = document.getElementById('renameItemPath').value.trim();
+    const newName = document.getElementById('renameItemName').value.trim();
     
     if (!oldPath || !newName) {
         showAlert('danger', 'Por favor, ingrese una ruta y un nuevo nombre');
@@ -408,7 +408,10 @@ document.getElementById('renameItemForm').addEventListener('submit', async (e) =
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ oldPath, newName }),
+            body: JSON.stringify({
+                oldPath: oldPath,
+                newName: newName
+            }),
         });
         const data = await response.json();
         
@@ -417,7 +420,7 @@ document.getElementById('renameItemForm').addEventListener('submit', async (e) =
             modal.hide();
             const parentPath = oldPath.split('/').slice(0, -1).join('/');
             loadDirectoryContent(parentPath);
-            showAlert('success', 'Renombrado correctamente');
+            showAlert('success', data.message);
         } else {
             showAlert('danger', data.message || 'Error al renombrar');
         }
