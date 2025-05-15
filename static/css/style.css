@@ -261,18 +261,14 @@ body {
 
 
 /* Estilos para el área de previsualización */
-.preview-pane { /* Use the new class */
-    /* Keep basic layout styles from Bootstrap */
-}
-
 #file-preview {
     background-color: var(--light-grey-bg); /* Fondo blanco grisáceo */
     border: 1px solid var(--medium-grey-border); /* Borde sutil */
     border-radius: var(--border-radius-md); /* Bordes redondeados */
-    font-family: 'Courier New', monospace;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-size: 0.95rem; /* Ligeramente más grande */
+    font-family: 'Courier New', monospace; /* Monospace font for code/text */
+    white-space: pre-wrap; /* Wrap long lines */
+    word-wrap: break-word; /* Break long words */
+    font-size: 0.95rem; /* Slightly larger font size */
     color: var(--primary-text);
     padding: var(--spacing-unit); /* Adjust padding */
     min-height: 200px; /* Keep minimum height */
@@ -299,21 +295,16 @@ body {
     font-size: 0.9rem; /* Slightly smaller font size for code block */
 }
 
-#file-preview pre code {
-    /* Optional: add specific styles for code highlighting if you use a library */
-}
-
 /* Styles for the maximize preview button and preview header */
 .preview-pane .d-flex.justify-content-between.align-items-center {
-    /* Ensure the title and button are on the same line by default */
+    /* Ensure the title and button are on the same line by default (large screens) */
     flex-wrap: nowrap; /* Prevent wrapping by default */
 }
 
 .preview-pane .d-flex.justify-content-between.align-items-center h5 {
-    /* Allow the title to shrink */
+    /* Allow the title to shrink and truncate on large/medium screens */
     flex-shrink: 1;
     min-width: 0; /* Allow content to shrink below flex basis */
-    /* Make the title text truncate if it overflows */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -321,7 +312,7 @@ body {
 
 #maximizePreviewBtn {
     flex-shrink: 0; /* Prevent the button from shrinking */
-    margin-left: 0.5rem; /* Add space between title and button */
+    margin-left: 0.5rem; /* Add space between title and button on large/medium screens */
     transition: visibility 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 
@@ -467,7 +458,7 @@ body {
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: #555; /* Color del "pulgar" al pasar el ratón */
-}
+} /* <-- Added missing closing brace */
 
 
 /* Responsive adjustments */
@@ -538,11 +529,11 @@ body {
       .preview-pane .d-flex.justify-content-between.align-items-center {
          flex-direction: column; /* Stack title and button vertically */
          align-items: flex-start !important; /* Align items to the start */
-         margin-bottom: var(--spacing-unit) * 0.8 !important; /* Adjust margin */
+         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Adjust margin */
       }
 
       .preview-pane .d-flex.justify-content-between.align-items-center h5 {
-         /* Allow title to wrap naturally when stacked */
+         /* Allow title to wrap naturally when stacked on small screens */
          white-space: normal;
          overflow: visible;
          text-overflow: clip;
@@ -564,7 +555,7 @@ body {
               padding: calc(var(--spacing-unit) * 0.6) !important;
            }
       }
-}
+} /* <-- Added missing closing brace */
 
 /* Add a medium breakpoint for better control */
 @media (min-width: 768px) and (max-width: 991.98px) { /* For medium screens */
@@ -621,15 +612,15 @@ body {
          /* Title and button on the same line, allow title to truncate */
          flex-wrap: nowrap;
          align-items: center !important;
-         margin-bottom: var(--spacing-unit) * 0.8 !important; /* Adjust margin */
+         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Adjust margin */
       }
       .preview-pane .d-flex.justify-content-between.align-items-center h5 {
-           white-space: nowrap;
-           overflow: hidden;
-           text-overflow: ellipsis;
-           margin-bottom: 0; /* No bottom margin when on same line */
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         margin-bottom: 0; /* No bottom margin when on same line */
       }
-      #maximizePreviewBtn {
+       #maximizePreviewBtn {
          margin-left: 0.5rem; /* Add margin */
          align-self: auto; /* Reset align-self */
       }
@@ -673,7 +664,7 @@ body {
          /* Title and button on the same line, allow title to truncate */
          flex-wrap: nowrap;
          align-items: center !important;
-         margin-bottom: var(--spacing-unit) * 0.8 !important; /* Adjust margin */
+         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Adjust margin */
       }
       .preview-pane .d-flex.justify-content-between.align-items-center h5 {
            white-space: nowrap;
