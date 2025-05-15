@@ -1,101 +1,76 @@
 /* Estilos generales para el cuerpo */
 body {
-    background-color: #f8f9fa; /* Fondo gris claro */
-    font-family: 'Arial', sans-serif; /* Fuente legible */
+    background-color: #eef2f7; /* Fondo azul claro muy suave */
+    font-family: 'Inter', sans-serif; /* Usar la fuente Inter */
     line-height: 1.6;
+    color: #333; /* Color de texto principal */
 }
 
 /* Estilos para el contenedor principal de Bootstrap */
 .container {
-    /* Bootstrap's .container provides centering and max-width */
-    /* Add some vertical margin */
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-top: 2rem; /* Aumentar margen superior */
+    margin-bottom: 2rem; /* Aumentar margen inferior */
 }
 
 /* Estilos para la tarjeta principal que envuelve todo */
 .card {
-    /* Bootstrap's .card provides background and some styling */
-    border: none; /* Remove default card border */
+    border: 1px solid #dee2e6; /* Borde sutil */
+    border-radius: 0.75rem !important; /* Bordes más redondeados */
+    overflow: hidden; /* Asegura que los bordes redondeados se apliquen a los contenidos */
 }
 
 /* Estilos para la cabecera de la tarjeta (donde está el título y buscador) */
 .card-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Add a subtle border below header */
+    background-color: #f8f9fa !important; /* Fondo ligeramente más claro */
+    border-bottom: 1px solid #dee2e6; /* Borde sutil */
+    padding: 1.25rem 1.5rem; /* Aumentar padding */
 }
+
+.card-header .fs-4 {
+    font-weight: 600; /* Semibold para el título */
+    color: #003366; /* Un azul más oscuro para el título */
+}
+
+/* Estilos para el input group del buscador */
+.input-group {
+    border-radius: 0.5rem; /* Bordes redondeados para el input group */
+    overflow: hidden; /* Asegura que los bordes redondeados se apliquen a los contenidos */
+}
+
+.input-group-text {
+    background-color: #fff; /* Fondo blanco para el icono */
+    border-right: none !important;
+    border-color: #ced4da; /* Color de borde estándar de form-control */
+}
+
+.form-control {
+    border-left: none !important;
+    border-color: #ced4da; /* Color de borde estándar */
+    box-shadow: none !important; /* Eliminar box-shadow por defecto al enfocar */
+}
+
+.form-control:focus {
+    border-color: #007bff; /* Borde azul al enfocar */
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25) !important; /* Sombra suave azul al enfocar */
+}
+
 
 /* Estilos para el cuerpo de la tarjeta (contiene sidebar, browser, preview) */
 .card-body {
-    /* Remove default card body padding if row g-0 is used on direct children */
-    padding: 0; 
+    padding: 0;
 }
-
-/* Estilos para los elementos de la lista del explorador (usando list-group) */
-#browser-content .list-group-item {
-    border: none; /* Remove default list-group-item borders */
-    border-bottom: 1px solid #eee; /* Add a light border between items */
-    padding: 0.75rem 1.25rem; /* Add padding */
-    cursor: pointer; /* Indicate clickable items */
-    transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth hover and selection effect */
-}
-
-#browser-content .list-group-item:last-child {
-    border-bottom: none; /* No border on the last item */
-}
-
-#browser-content .list-group-item:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-}
-
-/* Estilo para el elemento seleccionado */
-#browser-content .list-group-item.list-group-item-primary {
-    background-color: #cfe2ff; /* Bootstrap primary light color */
-    border-color: #084298; /* Bootstrap primary dark color */
-    font-weight: bold; /* Make selected item text bold */
-}
-
-
-/* Estilos para los iconos dentro de los items */
-#browser-content .list-group-item i.bi {
-    font-size: 1.1rem; /* Slightly larger icons */
-    width: 1.5rem; /* Fixed width for alignment */
-    text-align: center;
-}
-
-/* Estilos para el área de previsualización */
-#file-preview {
-    /* Ensure it takes available height and has a background */
-    background-color: #e9ecef; /* Light grey background for preview area */
-    border-radius: 0.25rem; /* Rounded corners */
-    font-family: 'Courier New', monospace; /* Monospace font for code/text */
-    white-space: pre-wrap; /* Preserve whitespace and wrap lines */
-    word-wrap: break-word; /* Break long words */
-    font-size: 0.9rem; /* Slightly smaller font for content */
-    color: #333; /* Darker text color */
-    padding: 1rem; /* Add padding */
-    min-height: 150px; /* Minimum height */
-    /* Ensure flex properties align content correctly when it's empty or has error */
-    display: flex; 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Estilos para el bloque <pre> dentro de la previsualización normal */
-#file-preview pre {
-    margin: 0; /* Remove default pre margin */
-    border: none; /* Remove default pre border */
-    background-color: transparent; /* Transparent background */
-    padding: 0; /* Remove default pre padding */
-    flex-grow: 1; /* Allow pre to take available space */
-    width: 100%; /* Ensure pre takes full width of its container */
-}
-
 
 /* Estilos para la barra lateral de acciones */
+.col-md-3.border-end, .col-lg-2.border-end {
+    border-right: 1px solid #dee2e6 !important; /* Borde sutil */
+}
+
 .list-group-flush .list-group-item {
-    border-width: 0 0 1px 0; /* Only bottom border */
-    padding: 0.75rem 1.25rem;
+    border-width: 0 0 1px 0;
+    border-color: #eee; /* Color de borde más claro */
+    padding: 1rem 1.5rem; /* Aumentar padding */
+    font-weight: 500; /* Medium weight */
+    color: #555; /* Color de texto más suave */
 }
 
 .list-group-flush .list-group-item:last-child {
@@ -103,31 +78,129 @@ body {
 }
 
 .list-group-item-action:hover {
-    color: #007bff; /* Bootstrap primary color */
-    background-color: #e9ecef; /* Light grey background on hover */
+    color: #007bff;
+    background-color: #e9ecef;
 }
 
-/* Estilo para botones de acción deshabilitados en la sidebar */
+.list-group-item-action:active {
+     background-color: #cfe2ff; /* Resaltar al hacer clic */
+     color: #003366;
+}
+
+
+/* Estilos para el área del navegador y previsualización */
+.col-md-8.border-end {
+     border-right: 1px solid #dee2e6 !important; /* Borde sutil */
+}
+
+/* Estilos para la cabecera del navegador y previsualización */
+.h5.mb-0 {
+    font-weight: 600; /* Semibold */
+    color: #003366; /* Azul oscuro */
+}
+
+#currentPath {
+     color: #007bff; /* Azul primario para la ruta */
+     font-weight: 600;
+}
+
+
+/* Estilos para los elementos de la lista del explorador (usando list-group) */
+#browser-content .list-group-item {
+    border-bottom: 1px solid #eee; /* Borde sutil */
+    padding: 0.75rem 1.5rem; /* Aumentar padding */
+    font-weight: 400; /* Regular weight */
+    color: #333;
+}
+
+#browser-content .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilo para el elemento seleccionado */
+#browser-content .list-group-item.list-group-item-primary {
+    background-color: #cfe2ff;
+    border-color: #007bff;
+    font-weight: 500; /* Medium weight */
+    color: #003366;
+}
+
+/* Estilos para los iconos dentro de los items */
+#browser-content .list-group-item i.bi {
+    font-size: 1.1rem;
+    width: 1.8rem; /* Aumentar ancho para mejor alineación */
+    text-align: center;
+}
+
+#browser-content .list-group-item i.bi-folder-fill { color: #ffda6a; } /* Icono de carpeta amarillo */
+#browser-content .list-group-item i.bi-file-earmark-fill { color: #5bc0de; } /* Icono de archivo azul claro */
+#browser-content .list-group-item i.bi-arrow-up-circle-fill { color: #6c757d; } /* Icono subir nivel gris */
+
+
+/* Estilos para el área de previsualización */
+#file-preview {
+    background-color: #f8f9fa; /* Fondo blanco grisáceo */
+    border: 1px solid #dee2e6; /* Borde sutil */
+    border-radius: 0.5rem; /* Bordes redondeados */
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.95rem; /* Ligeramente más grande */
+    color: #333;
+    padding: 1.5rem; /* Aumentar padding */
+    min-height: 200px; /* Aumentar altura mínima */
+    /* Ensure flex properties align content correctly when it's empty or has error */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center; /* Centrar texto por defecto */
+}
+
+/* Estilos para el bloque <pre> dentro de la previsualización normal */
+#file-preview pre {
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    flex-grow: 1;
+    width: 100%;
+    text-align: left; /* Alinear texto a la izquierda para contenido real */
+    color: #212529; /* Color de texto más oscuro para el contenido */
+}
+
+#file-preview .text-muted {
+    text-align: center; /* Asegurar que el texto de "Selecciona un archivo..." esté centrado */
+}
+
+
+/* Estilos para la barra lateral de acciones deshabilitadas */
 .list-group-item-action:disabled {
-    opacity: 0.5; /* Reduce opacity */
-    cursor: not-allowed; /* Show not-allowed cursor */
-    /* pointer-events: auto; */ /* Allow click event to be captured for showing alert - handled in JS now */
+    opacity: 0.6; /* Reducir opacidad */
+    cursor: not-allowed;
+    background-color: #f8f9fa; /* Fondo ligeramente diferente para deshabilitados */
 }
 
-/* Estilos para grupos de botones pequeños */
+
+/* Estilos para grupos de botones pequeños (en la lista de items, si los hubiera) */
 .btn-group-sm > .btn {
-    padding: 0.25rem 0.5rem; /* Smaller padding for small buttons */
-    font-size: 0.875rem; /* Smaller font size */
-    line-height: 1.5;
-    border-radius: 0.2rem; /* Smaller border-radius */
+    padding: 0.25rem 0.6rem; /* Ajustar padding */
+    font-size: 0.875rem;
+    border-radius: 0.25rem; /* Ajustar border-radius */
 }
 
 /* Estilos para los mensajes flash (Bootstrap alerts) */
 .alert {
-    margin-top: 1rem; /* Add space above alerts */
-    margin-bottom: 1rem; /* Add space below alerts */
-    border-radius: 0.25rem; /* Standard Bootstrap border-radius */
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem; /* Bordes redondeados */
+    font-weight: 500; /* Medium weight */
 }
+
+.alert .bi {
+    font-size: 1.2rem; /* Iconos más grandes en alertas */
+}
+
 
 /* Ensure flex items in row take full height */
 .row.g-0 > [class*="col-"] {
@@ -136,53 +209,102 @@ body {
 }
 
 .row.g-0 .h-100 {
-    flex-grow: 1; /* Allow content areas to grow */
+    flex-grow: 1;
 }
 
 /* Style for the search term highlight */
 .bg-warning {
-    background-color: #ffc107 !important; /* Bootstrap warning yellow */
+    background-color: #ffc107 !important;
+    color: #212529 !important; /* Texto oscuro sobre el amarillo */
+    padding: 0.1rem 0.4rem; /* Padding ligero */
+    border-radius: 0.2rem; /* Bordes redondeados */
 }
 
 /* Estilos para el modal de previsualización maximizada */
+#previewModal .modal-content {
+    border-radius: 0.75rem !important; /* Bordes redondeados */
+}
+
+#previewModal .modal-header {
+     border-bottom: 1px solid #dee2e6; /* Borde sutil */
+     background-color: #f8f9fa;
+}
+
+#previewModal .modal-title {
+     font-weight: 600;
+     color: #003366;
+}
+
 #previewModal .modal-body {
     display: flex;
     flex-direction: column;
+    padding: 1.5rem; /* Aumentar padding */
 }
 
 #previewModal #previewModalFileContent {
-     background-color: #e9ecef; /* Consistent background */
-     border-radius: 0.25rem; /* Rounded corners */
-     font-family: 'Courier New', monospace; /* Monospace font */
-     white-space: pre-wrap; /* Preserve whitespace and wrap lines */
-     word-wrap: break-word; /* Break long words */
-     font-size: 1rem; /* Slightly larger font in modal */
-     color: #333; /* Darker text color */
-     padding: 1rem; /* Add padding */
-     flex-grow: 1; /* Allow content to fill modal height */
-     overflow: auto; /* Add scroll if content overflows */
+     background-color: #e9ecef; /* Fondo ligeramente gris */
+     border: 1px solid #ced4da; /* Borde */
+     border-radius: 0.5rem; /* Bordes redondeados */
+     font-family: 'Courier New', monospace;
+     white-space: pre-wrap;
+     word-wrap: break-word;
+     font-size: 1rem;
+     color: #212529;
+     padding: 1.5rem; /* Aumentar padding */
+     flex-grow: 1;
+     overflow: auto;
+}
+
+#previewModal .modal-footer {
+     border-top: 1px solid #dee2e6; /* Borde sutil */
+     background-color: #f8f9fa;
+}
+
+/* Custom scrollbar styles for a cleaner look */
+/* Works in Webkit browsers (Chrome, Safari) */
+.custom-scroll::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento vertical */
+  height: 8px; /* Alto de la barra de desplazamiento horizontal */
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Fondo de la pista */
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #888; /* Color del "pulgar" de la barra */
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color del "pulgar" al pasar el ratón */
 }
 
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .card-header {
-        flex-direction: column; /* Stack header items on small screens */
+        flex-direction: column;
         align-items: stretch !important;
     }
     .card-header .d-flex.align-items-center {
-        margin-bottom: 0.5rem; /* Add space between stacked items */
+        margin-bottom: 0.75rem; /* Ajustar espacio */
     }
     .card-header .input-group {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem; /* Ajustar espacio */
     }
     .col-md-3.border-end {
-        border-right: none !important; /* Remove vertical border on small screens */
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Add horizontal border */
+        border-right: none !important;
+        border-bottom: 1px solid #dee2e6; /* Borde horizontal */
     }
      .col-md-8.border-end {
-        border-right: none !important; /* Remove vertical border on small screens */
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Add horizontal border */
+        border-right: none !important;
+        border-bottom: 1px solid #dee2e6; /* Borde horizontal */
+    }
+    /* Asegurar que las columnas ocupen todo el ancho en pantallas pequeñas */
+    .col-md-3, .col-md-8, .col-md-4 {
+        width: 100%;
     }
 }
 

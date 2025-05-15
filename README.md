@@ -135,7 +135,3 @@ Una vez que la aplicación esté en funcionamiento y accedas a `http://127.0.0.1
 * Utiliza el enlace "View Data Directory Contents" para explorar la carpeta `data` y ver los resultados de tus operaciones.
 
 * Cuando se te pida una ruta, proporciona la ruta *relativa* al directorio `data/` (por ejemplo, `mi_carpeta/mi_archivo.txt` o `nuevo_directorio`). No uses barras iniciales (`/`) ni `..` al principio de las rutas.
-
-## Nota sobre Anticopia
-
-Según lo solicitado, se incluye un identificador simbólico (`PROJECT_ID`) en el archivo `app.py`. Ten en cuenta que este es un marcador básico y no proporciona una protección robusta contra el código compartido o la detección de contenido generado por IA. El verdadero valor de tu proyecto reside en tu comprensión, tus elecciones de implementación únicas y el proceso de aprendizaje.
