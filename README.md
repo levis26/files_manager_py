@@ -23,19 +23,41 @@ La aplicación soporta las siguientes operaciones dentro del directorio `data`:
 El proyecto sigue una estructura sencilla:
 
 ```
-/project_root
-├── app.py              # El archivo principal de la aplicación Flask
-├── data/               # Directorio para el almacenamiento de archivos y directorios
-└── templates/          # Directorio para las plantillas HTML
-    ├── index.html      # Página del menú principal
-    ├── create_dir.html # Formulario para crear directorios
-    ├── create_file.html # Formulario para crear archivos
-    ├── append_file.html # Formulario para añadir a archivos
-    ├── delete_item.html # Formulario para eliminar archivos/directorios
-    └── view_data.html  # Página para ver el contenido del directorio data
+## Estructura del Proyecto: Python + Flask
 
+```plaintext
+.
+├── api
+│   ├── browse.py
+│   ├── creation.py
+│   ├── file_content.py
+│   ├── __init__.py
+│   ├── modification.py
+│   ├── __pycache__
+│   │   ├── browse.cpython-312.pyc
+│   │   ├── creation.cpython-312.pyc
+│   │   ├── file_content.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── modification.cpython-312.pyc
+│   │   └── search.cpython-312.pyc
+│   └── search.py
+├── app.py
+├── data
+│   └── # Aquí se crearán dinámicamente los directorios y archivos cargados por el sistema
+├── __pycache__
+│   └── utils.cpython-312.pyc
+├── README.md
+├── requirements.txt
+├── static
+│   ├── css
+│   │   └── style.css
+│   └── js
+│       └── main.js
+├── templates
+│   ├── base.html
+│   └── index.html
+└── utils.py
 
-```
 
 El directorio `data/` se crea automáticamente cuando la aplicación se ejecuta si no existe.
 

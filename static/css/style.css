@@ -1,56 +1,100 @@
+/* Define CSS variables for colors for easier management */
+:root {
+    --primary-color: #007bff; /* Bootstrap primary blue */
+    --primary-color-rgb: 0, 123, 255; /* RGB values for rgba() */
+    --secondary-color: #6c757d; /* Bootstrap secondary grey */
+    --secondary-color-rgb: 108, 117, 125; /* RGB values for rgba() */
+    --success-color: #28a745; /* Bootstrap success green */
+    --danger-color: #dc3545; /* Bootstrap danger red */
+    --danger-color-rgb: 220, 53, 69; /* RGB values for rgba() */
+    --warning-color: #ffc107; /* Bootstrap warning yellow */
+    --info-color: #17a2b8; /* Bootstrap info cyan */
+
+    --light-blue-bg: #eef2f7; /* Soft background blue */
+    --light-grey-bg: #f8f9fa; /* Light grey background */
+    --medium-grey-border: #dee2e6; /* Medium grey border */
+    --light-grey-border: #eee; /* Lighter grey border */
+    --dark-blue-text: #003366; /* Dark blue for titles */
+    --primary-text: #333; /* Primary text color */
+    --secondary-text: #555; /* Secondary text color */
+    --muted-text: #6c757d; /* Muted text color (same as secondary) */
+
+    --folder-icon-color: #ffda6a; /* Yellowish folder icon */
+    --file-icon-color: #5bc0de; /* Light blue file icon */
+    --up-icon-color: #6c757d; /* Grey up arrow icon */
+
+    --border-radius-sm: 0.25rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
+
+    --spacing-unit: 1.5rem; /* Define a base spacing unit */
+}
+
+
 /* Estilos generales para el cuerpo */
 body {
-    background-color: #eef2f7; /* Fondo azul claro muy suave */
+    background-color: var(--light-blue-bg); /* Fondo azul claro muy suave */
     font-family: 'Inter', sans-serif; /* Usar la fuente Inter */
     line-height: 1.6;
-    color: #333; /* Color de texto principal */
+    color: var(--primary-text); /* Color de texto principal */
+    min-height: 100vh; /* Ensure body takes at least full viewport height */
+    display: flex;
+    flex-direction: column; /* Arrange content vertically */
 }
 
 /* Estilos para el contenedor principal de Bootstrap */
 .container {
-    margin-top: 2rem; /* Aumentar margen superior */
-    margin-bottom: 2rem; /* Aumentar margen inferior */
+    margin-top: var(--spacing-unit); /* Use CSS variable */
+    margin-bottom: var(--spacing-unit); /* Use CSS variable */
+    flex-grow: 1; /* Allow container to grow and fill vertical space */
 }
 
 /* Estilos para la tarjeta principal que envuelve todo */
 .card {
-    border: 1px solid #dee2e6; /* Borde sutil */
-    border-radius: 0.75rem !important; /* Bordes más redondeados */
+    border: 1px solid var(--medium-grey-border); /* Borde sutil */
+    border-radius: var(--border-radius-lg) !important; /* Bordes más redondeados */
     overflow: hidden; /* Asegura que los bordes redondeados se apliquen a los contenidos */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08); /* More pronounced shadow */
+    display: flex; /* Use flexbox for card body */
+    flex-direction: column; /* Stack header and body vertically */
+    height: 100%; /* Ensure card takes full height of container (if container grows) */
 }
 
 /* Estilos para la cabecera de la tarjeta (donde está el título y buscador) */
 .card-header {
-    background-color: #f8f9fa !important; /* Fondo ligeramente más claro */
-    border-bottom: 1px solid #dee2e6; /* Borde sutil */
-    padding: 1.25rem 1.5rem; /* Aumentar padding */
+    background-color: var(--light-grey-bg) !important; /* Fondo ligeramente más claro */
+    border-bottom: 1px solid var(--medium-grey-border); /* Borde sutil */
+    padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Calculate padding based on spacing unit */
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .card-header .fs-4 {
     font-weight: 600; /* Semibold para el título */
-    color: #003366; /* Un azul más oscuro para el título */
+    color: var(--dark-blue-text); /* Un azul más oscuro para el título */
 }
 
 /* Estilos para el input group del buscador */
 .input-group {
-    border-radius: 0.5rem; /* Bordes redondeados para el input group */
+    border-radius: var(--border-radius-md); /* Bordes redondeados para el input group */
     overflow: hidden; /* Asegura que los bordes redondeados se apliquen a los contenidos */
 }
 
 .input-group-text {
-    background-color: #fff; /* Fondo blanco para el icono */
+    background-color: var(--light-grey-bg); /* Fondo blanco para el icono */
     border-right: none !important;
-    border-color: #ced4da; /* Color de borde estándar de form-control */
+    border-color: var(--medium-grey-border); /* Color de borde estándar de form-control */
 }
 
 .form-control {
     border-left: none !important;
-    border-color: #ced4da; /* Color de borde estándar */
+    border-color: var(--medium-grey-border); /* Color de borde estándar */
     box-shadow: none !important; /* Eliminar box-shadow por defecto al enfocar */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Add smooth transition */
 }
 
 .form-control:focus {
-    border-color: #007bff; /* Borde azul al enfocar */
+    border-color: var(--primary-color); /* Borde azul al enfocar */
     box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25) !important; /* Sombra suave azul al enfocar */
 }
 
@@ -58,19 +102,29 @@ body {
 /* Estilos para el cuerpo de la tarjeta (contiene sidebar, browser, preview) */
 .card-body {
     padding: 0;
+    display: flex; /* Use flexbox for the row inside card body */
+    flex-direction: column; /* Stack row vertically if needed */
+    flex-grow: 1; /* Allow card body to grow and fill remaining space */
+}
+
+/* Ensure the row inside card-body takes full height */
+.card-body > .row.g-0 {
+    flex-grow: 1;
 }
 
 /* Estilos para la barra lateral de acciones */
-.col-md-3.border-end, .col-lg-2.border-end {
-    border-right: 1px solid #dee2e6 !important; /* Borde sutil */
+.sidebar { /* Use the new class */
+    border-right: 1px solid var(--medium-grey-border); /* Borde sutil */
+    background-color: var(--light-grey-bg); /* Slightly different background */
 }
 
 .list-group-flush .list-group-item {
     border-width: 0 0 1px 0;
-    border-color: #eee; /* Color de borde más claro */
-    padding: 1rem 1.5rem; /* Aumentar padding */
+    border-color: var(--light-grey-border); /* Color de borde más claro */
+    padding: calc(var(--spacing-unit) * 0.6) var(--spacing-unit); /* Adjust padding */
     font-weight: 500; /* Medium weight */
-    color: #555; /* Color de texto más suave */
+    color: var(--secondary-text); /* Color de texto más suave */
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Add smooth transition */
 }
 
 .list-group-flush .list-group-item:last-child {
@@ -78,127 +132,229 @@ body {
 }
 
 .list-group-item-action:hover {
-    color: #007bff;
-    background-color: #e9ecef;
+    color: var(--primary-color);
+    background-color: rgba(var(--primary-color-rgb), 0.05); /* Subtle hover background using primary color */
 }
 
 .list-group-item-action:active {
-     background-color: #cfe2ff; /* Resaltar al hacer clic */
-     color: #003366;
+     background-color: rgba(var(--primary-color-rgb), 0.1); /* More pronounced active background */
+     color: var(--dark-blue-text);
+}
+
+/* Add a separator between the sidebar and the main content on larger screens */
+@media (min-width: 768px) {
+    .sidebar {
+        border-right: 1px solid var(--medium-grey-border) !important; /* Ensure border is visible */
+    }
 }
 
 
 /* Estilos para el área del navegador y previsualización */
-.col-md-8.border-end {
-     border-right: 1px solid #dee2e6 !important; /* Borde sutil */
+.browser-pane { /* Use the new class */
+     border-right: 1px solid var(--medium-grey-border); /* Borde sutil */
 }
 
 /* Estilos para la cabecera del navegador y previsualización */
 .h5.mb-0 {
     font-weight: 600; /* Semibold */
-    color: #003366; /* Azul oscuro */
+    color: var(--dark-blue-text); /* Azul oscuro */
 }
 
 #currentPath {
-     color: #007bff; /* Azul primario para la ruta */
+     color: var(--primary-color); /* Azul primario para la ruta */
      font-weight: 600;
 }
 
 
 /* Estilos para los elementos de la lista del explorador (usando list-group) */
 #browser-content .list-group-item {
-    border-bottom: 1px solid #eee; /* Borde sutil */
-    padding: 0.75rem 1.5rem; /* Aumentar padding */
+    border-bottom: 1px solid var(--light-grey-border); /* Borde sutil */
+    padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit); /* Adjust padding */
     font-weight: 400; /* Regular weight */
-    color: #333;
+    color: var(--primary-text);
+    transition: background-color 0.2s ease-in-out; /* Add smooth transition */
 }
 
 #browser-content .list-group-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--light-grey-bg);
 }
 
-/* Estilo para el elemento seleccionado */
+/* Style for the selected item */
 #browser-content .list-group-item.list-group-item-primary {
-    background-color: #cfe2ff;
-    border-color: #007bff;
+    background-color: rgba(var(--primary-color-rgb), 0.15); /* More prominent selection background */
+    border-color: var(--primary-color);
     font-weight: 500; /* Medium weight */
-    color: #003366;
+    color: var(--dark-blue-text);
 }
 
-/* Estilos para los iconos dentro de los items */
+/* Styles for icons within list items */
 #browser-content .list-group-item i.bi {
     font-size: 1.1rem;
-    width: 1.8rem; /* Aumentar ancho para mejor alineación */
+    width: 1.8rem; /* Increase width for better alignment */
     text-align: center;
 }
 
-#browser-content .list-group-item i.bi-folder-fill { color: #ffda6a; } /* Icono de carpeta amarillo */
-#browser-content .list-group-item i.bi-file-earmark-fill { color: #5bc0de; } /* Icono de archivo azul claro */
-#browser-content .list-group-item i.bi-arrow-up-circle-fill { color: #6c757d; } /* Icono subir nivel gris */
+#browser-content .list-group-item i.bi-folder-fill { color: var(--folder-icon-color); } /* Folder icon color */
+#browser-content .list-group-item i.bi-file-earmark-fill { color: var(--file-icon-color); } /* File icon color */
+#browser-content .list-group-item i.bi-arrow-up-circle-fill { color: var(--up-icon-color); } /* Up level icon color */
+
+/* Style for the action buttons group within list items */
+#browser-content .list-group-item .btn-group-sm {
+    opacity: 0; /* Initially hide action buttons */
+    transition: opacity 0.2s ease-in-out; /* Add transition */
+}
+
+#browser-content .list-group-item:hover .btn-group-sm,
+#browser-content .list-group-item.list-group-item-primary .btn-group-sm {
+    opacity: 1; /* Show action buttons on hover or when selected */
+}
+
+#browser-content .list-group-item .btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem; /* Adjusted padding */
+    font-size: 0.8rem; /* Slightly smaller font size */
+    border-radius: var(--border-radius-sm); /* Adjusted border-radius */
+    color: var(--secondary-color); /* Default button color */
+    border-color: var(--medium-grey-border);
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
+    backdrop-filter: blur(2px); /* Add a subtle blur effect behind buttons */
+}
+
+#browser-content .list-group-item .btn-group-sm > .btn:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+}
+
+#browser-content .list-group-item .btn-group-sm > .btn-outline-danger:hover {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+    background-color: rgba(var(--danger-color-rgb), 0.1);
+}
+
+/* Styles for placeholder content (loading, empty, initial preview, error) */
+.loading-state, .empty-state, .initial-preview-state, .preview-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%; /* Ensure placeholders take full height of their container */
+    text-align: center;
+    color: var(--muted-text);
+    padding: var(--spacing-unit); /* Add padding to placeholders */
+}
+
+.loading-state .spinner-border {
+    margin-bottom: var(--spacing-unit) * 0.5;
+}
+
+.initial-preview-state i.bi,
+.preview-error-state i.bi,
+.empty-state i.bi {
+    font-size: 3rem; /* Larger icons for empty/error states */
+    margin-bottom: var(--spacing-unit) * 0.5;
+}
+
+.preview-error-state .text-danger {
+    color: var(--danger-color) !important;
+}
 
 
 /* Estilos para el área de previsualización */
+.preview-pane { /* Use the new class */
+    /* Keep basic layout styles from Bootstrap */
+}
+
 #file-preview {
-    background-color: #f8f9fa; /* Fondo blanco grisáceo */
-    border: 1px solid #dee2e6; /* Borde sutil */
-    border-radius: 0.5rem; /* Bordes redondeados */
+    background-color: var(--light-grey-bg); /* Fondo blanco grisáceo */
+    border: 1px solid var(--medium-grey-border); /* Borde sutil */
+    border-radius: var(--border-radius-md); /* Bordes redondeados */
     font-family: 'Courier New', monospace;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-size: 0.95rem; /* Ligeramente más grande */
-    color: #333;
-    padding: 1.5rem; /* Aumentar padding */
-    min-height: 200px; /* Aumentar altura mínima */
-    /* Ensure flex properties align content correctly when it's empty or has error */
+    color: var(--primary-text);
+    padding: var(--spacing-unit); /* Adjust padding */
+    min-height: 200px; /* Keep minimum height */
+    /* Ensure flex properties align content correctly */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center; /* Centrar texto por defecto */
+    /* Removed justify-content/align-items/text-align from here
+       as they are handled by placeholder states or pre tag */
+    gap: 0.5rem; /* Add gap between flex items (like path and content) */
 }
 
 /* Estilos para el bloque <pre> dentro de la previsualización normal */
 #file-preview pre {
     margin: 0;
-    border: none;
-    background-color: transparent;
-    padding: 0;
+    border: 1px solid #ced4da; /* Add a border to the content area */
+    background-color: #e9ecef; /* Slightly grey background */
+    padding: var(--spacing-unit) * 0.8; /* Add padding inside the content block */
     flex-grow: 1;
     width: 100%;
-    text-align: left; /* Alinear texto a la izquierda para contenido real */
-    color: #212529; /* Color de texto más oscuro para el contenido */
+    text-align: left; /* Align text to the left for actual content */
+    color: var(--primary-text); /* Darker text color for content */
+    border-radius: var(--border-radius-sm); /* Slightly rounded corners */
+    overflow: auto; /* Ensure scrollbar for content */
+    font-size: 0.9rem; /* Slightly smaller font size for code block */
 }
 
-#file-preview .text-muted {
-    text-align: center; /* Asegurar que el texto de "Selecciona un archivo..." esté centrado */
+#file-preview pre code {
+    /* Optional: add specific styles for code highlighting if you use a library */
+}
+
+/* Styles for the maximize preview button and preview header */
+.preview-pane .d-flex.justify-content-between.align-items-center {
+    /* Ensure the title and button are on the same line by default */
+    flex-wrap: nowrap; /* Prevent wrapping by default */
+}
+
+.preview-pane .d-flex.justify-content-between.align-items-center h5 {
+    /* Allow the title to shrink */
+    flex-shrink: 1;
+    min-width: 0; /* Allow content to shrink below flex basis */
+    /* Make the title text truncate if it overflows */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#maximizePreviewBtn {
+    flex-shrink: 0; /* Prevent the button from shrinking */
+    margin-left: 0.5rem; /* Add space between title and button */
+    transition: visibility 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 
 
 /* Estilos para la barra lateral de acciones deshabilitadas */
 .list-group-item-action:disabled {
-    opacity: 0.6; /* Reducir opacidad */
+    opacity: 0.6; /* Reduce opacity */
     cursor: not-allowed;
-    background-color: #f8f9fa; /* Fondo ligeramente diferente para deshabilitados */
+    background-color: var(--light-grey-bg); /* Slightly different background for disabled */
+    color: var(--muted-text);
+}
+.list-group-item-action:disabled:hover {
+     background-color: var(--light-grey-bg); /* Prevent hover effect on disabled */
+     color: var(--muted-text);
+     cursor: not-allowed;
 }
 
 
-/* Estilos para grupos de botones pequeños (en la lista de items, si los hubiera) */
-.btn-group-sm > .btn {
-    padding: 0.25rem 0.6rem; /* Ajustar padding */
-    font-size: 0.875rem;
-    border-radius: 0.25rem; /* Ajustar border-radius */
-}
+/* Estilos para grupos de botones pequeños (en la lista de items) */
+/* These are already styled within #browser-content list items above */
+
 
 /* Estilos para los mensajes flash (Bootstrap alerts) */
+/* Keep default Bootstrap alert styles, they are already good */
 .alert {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-radius: 0.5rem; /* Bordes redondeados */
-    font-weight: 500; /* Medium weight */
+    margin-top: calc(var(--spacing-unit) * 0.8);
+    margin-bottom: calc(var(--spacing-unit) * 0.8);
+    border-radius: var(--border-radius-md);
+    font-weight: 500;
 }
 
 .alert .bi {
-    font-size: 1.2rem; /* Iconos más grandes en alertas */
+    font-size: 1.2rem; /* Larger icons in alerts */
 }
 
 
@@ -214,50 +370,82 @@ body {
 
 /* Style for the search term highlight */
 .bg-warning {
-    background-color: #ffc107 !important;
-    color: #212529 !important; /* Texto oscuro sobre el amarillo */
-    padding: 0.1rem 0.4rem; /* Padding ligero */
-    border-radius: 0.2rem; /* Bordes redondeados */
+    background-color: var(--warning-color) !important;
+    color: #212529 !important; /* Dark text on yellow */
+    padding: 0.1rem 0.4rem; /* Light padding */
+    border-radius: var(--border-radius-sm); /* Rounded corners */
 }
 
-/* Estilos para el modal de previsualización maximizada */
-#previewModal .modal-content {
-    border-radius: 0.75rem !important; /* Bordes redondeados */
+/* Estilos para los modales */
+.modal-content {
+    border-radius: var(--border-radius-lg) !important; /* Consistent rounded corners */
+    overflow: hidden; /* Ensure content respects border-radius */
 }
 
-#previewModal .modal-header {
-     border-bottom: 1px solid #dee2e6; /* Borde sutil */
-     background-color: #f8f9fa;
+.modal-header {
+     border-bottom: 1px solid var(--medium-grey-border); /* Subtle border */
+     background-color: var(--light-grey-bg);
+     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Adjust padding */
 }
 
-#previewModal .modal-title {
+.modal-title {
      font-weight: 600;
-     color: #003366;
+     color: var(--dark-blue-text);
+     display: flex; /* Align icon and title */
+     align-items: center;
 }
 
-#previewModal .modal-body {
+.modal-body {
     display: flex;
     flex-direction: column;
-    padding: 1.5rem; /* Aumentar padding */
+    padding: var(--spacing-unit); /* Adjust padding */
 }
 
-#previewModal #previewModalFileContent {
-     background-color: #e9ecef; /* Fondo ligeramente gris */
-     border: 1px solid #ced4da; /* Borde */
-     border-radius: 0.5rem; /* Bordes redondeados */
+.modal-body .form-label {
+    font-weight: 500; /* Medium weight for labels */
+    color: var(--secondary-text);
+    margin-bottom: 0.5rem;
+}
+
+.modal-body .form-control[readonly] {
+    background-color: #e9ecef; /* Slightly greyed out background for readonly inputs */
+    opacity: 1; /* Ensure opacity is not reduced */
+}
+
+.modal-body textarea.form-control {
+    font-family: 'Courier New', monospace; /* Monospace for content textareas */
+    font-size: 0.9rem;
+}
+
+#appendFileContentPreview {
+    background-color: #e9ecef; /* Slightly grey background for preview */
+    border: 1px solid var(--medium-grey-border);
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem; /* Adjust padding */
+    font-size: 0.85rem;
+    color: var(--primary-text);
+    overflow: auto; /* Ensure scroll if content is large */
+}
+
+.modal-footer {
+     border-top: 1px solid var(--medium-grey-border); /* Subtle border */
+     background-color: var(--light-grey-bg);
+     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Adjust padding */
+}
+
+/* Style for the maximized preview modal content */
+#previewModalFileContent {
+     background-color: #e9ecef; /* Slightly grey background */
+     border: 1px solid var(--medium-grey-border); /* Border */
+     border-radius: var(--border-radius-md); /* Rounded corners */
      font-family: 'Courier New', monospace;
      white-space: pre-wrap;
      word-wrap: break-word;
      font-size: 1rem;
-     color: #212529;
-     padding: 1.5rem; /* Aumentar padding */
+     color: var(--primary-text);
+     padding: var(--spacing-unit); /* Adjust padding */
      flex-grow: 1;
      overflow: auto;
-}
-
-#previewModal .modal-footer {
-     border-top: 1px solid #dee2e6; /* Borde sutil */
-     background-color: #f8f9fa;
 }
 
 /* Custom scrollbar styles for a cleaner look */
@@ -283,28 +471,228 @@ body {
 
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+/* Corrected breakpoint to target small screens up to 767.98px */
+@media (max-width: 767.98px) {
     .card-header {
         flex-direction: column;
         align-items: stretch !important;
     }
     .card-header .d-flex.align-items-center {
-        margin-bottom: 0.75rem; /* Ajustar espacio */
+        margin-bottom: 0.75rem; /* Adjust space */
+        width: 100%; /* Make the title area take full width */
+        justify-content: center; /* Center title and icon */
     }
-    .card-header .input-group {
-        margin-bottom: 0.75rem; /* Ajustar espacio */
+    .card-header .d-flex.align-items-center:last-child {
+        margin-bottom: 0; /* Remove bottom margin for the last item (search/reload) */
     }
-    .col-md-3.border-end {
+     .card-header .input-group {
+        margin-bottom: 0; /* Remove bottom margin */
+    }
+
+    .sidebar { /* Use the new class */
         border-right: none !important;
-        border-bottom: 1px solid #dee2e6; /* Borde horizontal */
+        border-bottom: 1px solid var(--medium-grey-border); /* Horizontal border */
     }
-     .col-md-8.border-end {
+     .browser-pane { /* Use the new class */
         border-right: none !important;
-        border-bottom: 1px solid #dee2e6; /* Borde horizontal */
+        border-bottom: 1px solid var(--medium-grey-border); /* Horizontal border */
     }
-    /* Asegurar que las columnas ocupen todo el ancho en pantallas pequeñas */
-    .col-md-3, .col-md-8, .col-md-4 {
+    /* Ensure columns take full width on small screens */
+    .col-md-3, .col-md-8, .col-md-4, .col-lg-2, .col-lg-10 {
         width: 100%;
     }
+
+     /* Adjust padding on small screens */
+     /* Apply padding directly to the pane divs for consistent inner spacing */
+     .sidebar > div,
+     .browser-pane > div,
+     .preview-pane > div {
+        padding: calc(var(--spacing-unit) * 0.8) !important; /* Slightly reduced padding */
+     }
+
+
+     /* Hide action buttons in browser list on small screens to save space,
+        user can rely on selecting and using sidebar actions. */
+     #browser-content .list-group-item .btn-group-sm {
+        display: none;
+     }
+
+     /* Adjust current path display on small screens */
+     #currentPath {
+        display: block; /* Show path on its own line if needed */
+        font-size: 0.9rem;
+     }
+      .h5.mb-0 .fs-5.text-muted {
+         font-size: 1rem !important; /* Adjust parent text size */
+      }
+      .h5.mb-0 .bi {
+         font-size: 1.2rem !important; /* Adjust icon size */
+      }
+
+      /* Adjust modal sizes for smaller screens */
+      .modal-dialog {
+        margin: calc(var(--spacing-unit) * 0.5); /* Add some margin */
+      }
+
+      /* Preview Pane Adjustments on small screens */
+      .preview-pane .d-flex.justify-content-between.align-items-center {
+         flex-direction: column; /* Stack title and button vertically */
+         align-items: flex-start !important; /* Align items to the start */
+         margin-bottom: var(--spacing-unit) * 0.8 !important; /* Adjust margin */
+      }
+
+      .preview-pane .d-flex.justify-content-between.align-items-center h5 {
+         /* Allow title to wrap naturally when stacked */
+         white-space: normal;
+         overflow: visible;
+         text-overflow: clip;
+         margin-bottom: 0.5rem; /* Add space below title when stacked */
+      }
+
+      #maximizePreviewBtn {
+         margin-left: 0; /* Remove left margin when stacked */
+         align-self: flex-end; /* Align button to the end of the container */
+         /* If you want it directly below the title aligned left, use align-self: flex-start; */
+      }
+
+      /* Further adjustments for extra small screens (under 576px) if needed */
+      @media (max-width: 575.98px) {
+          /* Smaller padding for tighter layout */
+           .sidebar > div,
+           .browser-pane > div,
+           .preview-pane > div {
+              padding: calc(var(--spacing-unit) * 0.6) !important;
+           }
+      }
 }
 
+/* Add a medium breakpoint for better control */
+@media (min-width: 768px) and (max-width: 991.98px) { /* For medium screens */
+    .card-header {
+        flex-direction: column; /* Stack title and search */
+        align-items: stretch !important;
+    }
+    .card-header .d-flex.align-items-center {
+        margin-bottom: 0.75rem; /* Add space between stacked items */
+        width: 100%; /* Make title area take full width */
+        justify-content: center; /* Center title and icon */
+    }
+    .card-header .d-flex.align-items-center:last-child {
+        margin-top: 0; /* No top margin when stacked */
+        margin-bottom: 0; /* Remove bottom margin */
+        width: 100%; /* Make search/reload take full width */
+    }
+    .card-header .input-group {
+        margin-bottom: 0.75rem; /* Add space below search */
+    }
+    .card-header .btn-outline-secondary {
+        width: 100%; /* Make reload button full width */
+        text-align: center;
+    }
+
+
+    .sidebar {
+        border-right: 1px solid var(--medium-grey-border); /* Keep border */
+    }
+     .browser-pane {
+        border-right: 1px solid var(--medium-grey-border); /* Keep border */
+    }
+
+     /* Adjust column widths for medium screens if necessary, though Bootstrap defaults are usually fine */
+    .col-md-3 { width: 25%; } /* Bootstrap default */
+    .col-md-8 { width: 66.666667%; } /* Bootstrap default */
+    .col-md-4 { width: 33.333333%; } /* Bootstrap default */
+
+     /* Adjust padding for medium screens */
+     .sidebar > div,
+     .browser-pane > div,
+     .preview-pane > div {
+        padding: var(--spacing-unit) !important; /* Standard padding */
+     }
+
+
+      /* Show action buttons on hover/select in browser list on medium screens */
+     #browser-content .list-group-item .btn-group-sm {
+        display: flex; /* Ensure buttons are displayed */
+     }
+
+     /* Preview Pane Adjustments on medium screens */
+      .preview-pane .d-flex.justify-content-between.align-items-center {
+         /* Title and button on the same line, allow title to truncate */
+         flex-wrap: nowrap;
+         align-items: center !important;
+         margin-bottom: var(--spacing-unit) * 0.8 !important; /* Adjust margin */
+      }
+      .preview-pane .d-flex.justify-content-between.align-items-center h5 {
+           white-space: nowrap;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           margin-bottom: 0; /* No bottom margin when on same line */
+      }
+      #maximizePreviewBtn {
+         margin-left: 0.5rem; /* Add margin */
+         align-self: auto; /* Reset align-self */
+      }
+}
+
+/* Add a large breakpoint adjustment */
+@media (min-width: 992px) { /* For large and extra-large screens */
+    .sidebar {
+        border-right: 1px solid var(--medium-grey-border); /* Keep border */
+    }
+     .browser-pane {
+        border-right: 1px solid var(--medium-grey-border); /* Keep border */
+    }
+     /* Adjust column widths for large screens */
+    .col-lg-2 { width: 16.666667%; } /* Sidebar takes 2 columns */
+    .col-lg-10 { width: 83.333333%; } /* Main content takes 10 columns */
+    /* Further split the 10 columns into browser (8) and preview (4) */
+    .main-content > .row.g-0 > .col-md-8 {
+         width: calc(8/10 * 100%); /* Browser takes 8/10 of the main content width */
+    }
+    .main-content > .row.g-0 > .col-md-4 {
+         width: calc(2/10 * 100%); /* Preview takes 2/10 of the main content width */
+    }
+
+
+     /* Adjust padding for large screens */
+     .sidebar > div,
+     .browser-pane > div,
+     .preview-pane > div {
+        padding: var(--spacing-unit) !important; /* Standard padding */
+     }
+
+
+      /* Show action buttons on hover/select in browser list on large screens */
+     #browser-content .list-group-item .btn-group-sm {
+        display: flex; /* Ensure buttons are displayed */
+     }
+
+     /* Preview Pane Adjustments on large screens */
+      .preview-pane .d-flex.justify-content-between.align-items-center {
+         /* Title and button on the same line, allow title to truncate */
+         flex-wrap: nowrap;
+         align-items: center !important;
+         margin-bottom: var(--spacing-unit) * 0.8 !important; /* Adjust margin */
+      }
+      .preview-pane .d-flex.justify-content-between.align-items-center h5 {
+           white-space: nowrap;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           margin-bottom: 0; /* No bottom margin when on same line */
+      }
+       #maximizePreviewBtn {
+         margin-left: 0.5rem; /* Add margin */
+         align-self: auto; /* Reset align-self */
+      }
+}
+
+
+/* Ensure sticky footer (if you add one) or content pushing to bottom */
+body {
+    display: flex;
+    flex-direction: column;
+}
+.container {
+    flex-grow: 1;
+}

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Archivos Profesional</title>
+    {# Links to Bootstrap, Icons, Font, and custom CSS are in base.html #}
+    {# We keep them here as well for direct access, though base.html includes them #}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,24 +13,24 @@
 </head>
 <body>
 
-    <div class="container my-4">
+    <main class="container my-4"> {# Use <main> for semantic structure #}
         <div class="card shadow-lg rounded-4 border-0">
-            <div class="card-header bg-light bg-gradient p-3 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
+            <div class="card-header bg-light bg-gradient p-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between"> {# Added flex-column/row for better responsiveness #}
+                <div class="d-flex align-items-center mb-2 mb-md-0"> {# Adjusted margin for responsiveness #}
                     <i class="bi bi-folder2-open me-2 fs-4 text-primary"></i>
                     <span class="fs-4 fw-bold">Gestor de Archivos</span>
                 </div>
-                <div class="d-flex align-items-center">
-                    <div class="input-group me-3">
+                <div class="d-flex align-items-center w-100 w-md-auto"> {# Adjusted width for responsiveness #}
+                    <div class="input-group me-3 flex-grow-1"> {# Added flex-grow for search input #}
                         <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search"></i>
+                            <i class="bi bi-search text-muted"></i> {# Added text-muted for softer icon color #}
                         </span>
                         <input type="text" class="form-control border-start-0 rounded-end" id="searchInput"
                                placeholder="Buscar archivos..."
                                oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(searchFiles, 300)">
                     </div>
-                    <button class="btn btn-outline-secondary" onclick="window.location.reload()">
-                        <i class="bi bi-arrow-clockwise"></i> Recargar
+                    <button class="btn btn-outline-secondary flex-shrink-0" onclick="window.location.reload()" title="Recargar"> {# Added flex-shrink-0 and title #}
+                        <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">Recargar</span> {# Hide text on small screens #}
                     </button>
                 </div>
             </div>
@@ -36,7 +38,7 @@
             <div class="card-body p-0">
                 <div class="row g-0">
                     <div class="col-md-3 col-lg-2 border-end">
-                        <div class="p-3">
+                        <div class="p-3 sidebar h-100"> {# Added sidebar class and h-100 for full height #}
                             <h5 class="d-flex align-items-center mb-3 text-secondary">
                                 <i class="bi bi-gear me-2 fs-5"></i> Acciones
                             </h5>
@@ -51,23 +53,35 @@
                         </div>
                     </div>
 
-                    <div class="col-md-9 col-lg-10">
+                    <div class="col-md-9 col-lg-10 main-content"> {# Added main-content class #}
                         <div class="row g-0 h-100">
-                            <div class="col-md-8 border-end">
+                            <div class="col-md-8 browser-pane border-end"> {# Added browser-pane class #}
                                 <div class="p-3 h-100 d-flex flex-column">
                                      <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="h5 mb-0 d-flex align-items-center">
                                             <i class="bi bi-folder2-open me-2 fs-5 text-secondary"></i>
-                                            <span class="fs-5 text-muted">Tu estás en: <span id="currentPath" class="fw-bold text-primary">data/</span></span>
+                                            <span class="fs-5 text-muted">Estás en: <span id="currentPath" class="fw-bold text-primary">data/</span></span> {# Slightly rephrased text #}
                                         </div>
                                     </div>
                                     <div id="browser-content" class="list-group flex-grow-1 overflow-auto custom-scroll">
-                                        <div class="text-muted text-center py-5">Cargando...</div>
+                                        {# Content will be loaded by JavaScript #}
+                                        {# Placeholder for loading state #}
+                                        <div class="text-muted text-center py-5 loading-state">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                            <p class="mt-2">Cargando...</p>
+                                        </div>
+                                         {# Placeholder for empty directory state #}
+                                        <div class="text-muted text-center py-5 empty-state d-none"> {# Initially hidden #}
+                                             <i class="bi bi-folder2-open fs-1 mb-3"></i>
+                                            <p>Este directorio está vacío.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-4 preview-pane"> {# Added preview-pane class #}
                                 <div class="p-3 h-100 d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="d-flex align-items-center mb-0 text-secondary">
@@ -77,9 +91,19 @@
                                             <i class="bi bi-arrows-fullscreen"></i>
                                         </button>
                                     </div>
-                                    <div id="file-preview" class="flex-grow-1 overflow-auto bg-light p-3 rounded-3 text-muted text-center d-flex align-items-center justify-content-center custom-scroll"
+                                    <div id="file-preview" class="flex-grow-1 overflow-auto bg-light p-3 rounded-3 text-muted text-center d-flex flex-column align-items-center justify-content-center custom-scroll"
                                          data-file-path="" data-file-content="">
-                                        Selecciona un archivo para ver su contenido
+                                        {# Placeholder for initial state #}
+                                        <div class="text-muted text-center py-5 initial-preview-state">
+                                             <i class="bi bi-file-earmark-text fs-1 mb-3"></i>
+                                            <p>Selecciona un archivo para ver su contenido.</p>
+                                        </div>
+                                         {# Placeholder for preview error state #}
+                                         <div class="text-muted text-center py-5 preview-error-state d-none"> {# Initially hidden #}
+                                            <i class="bi bi-x-circle-fill text-danger fs-1 mb-3"></i>
+                                            <p>Error al cargar la previsualización.</p>
+                                        </div>
+                                        {# File content will be loaded here by JavaScript #}
                                     </div>
                                 </div>
                             </div>
@@ -88,8 +112,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
+    {# Modals - Keep their structure largely the same, styling will enhance them #}
     <div class="modal fade" id="createDirModal" tabindex="-1" aria-labelledby="createDirModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -234,7 +259,8 @@
     </div>
 
     <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-fullscreen-lg-down"> <div class="modal-content">
+        <div class="modal-dialog modal-xl modal-fullscreen-lg-down"> {# Added fullscreen for large screens and down #}
+            <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="previewModalLabel"><i class="bi bi-file-earmark-text me-2"></i>Previsualización: <span id="previewModalFileName"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -253,6 +279,7 @@
     </div>
 
 
+    {# Scripts - Keep them at the end of the body #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
