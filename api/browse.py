@@ -25,6 +25,8 @@ def browse_directory():
             'message': 'Invalid path'
         })
 
+    # --- Añadido logging de existencia y tipo ---
+    print(f"/api/browse: Checking existence of '{full_current_path}'...")
     if not os.path.exists(full_current_path):
         print(f"/api/browse: Full path '{full_current_path}' does NOT exist. Sending error.")
         print(f"--- Fin /api/browse ---\n")
@@ -32,7 +34,9 @@ def browse_directory():
             'success': False,
             'message': 'Path does not exist'
         })
+    print(f"/api/browse: Path '{full_current_path}' exists.")
 
+    print(f"/api/browse: Checking if '{full_current_path}' is a directory...")
     if not os.path.isdir(full_current_path):
         print(f"/api/browse: Full path '{full_current_path}' is NOT a directory. Sending error.")
         print(f"--- Fin /api/browse ---\n")
@@ -40,6 +44,8 @@ def browse_directory():
             'success': False,
             'message': 'Path is not a directory'
         })
+    print(f"/api/browse: Path '{full_current_path}' is a directory.")
+
 
     items = []
     try:

@@ -29,7 +29,7 @@ app_dir = os.path.dirname(os.path.abspath(__file__))
 initialize_paths(app_dir) # Pasar la ruta del directorio de app.py a utils
 
 # Opcional: Verificar la ruta de DATA_DIR después de la inicialización
-print(f"DATA_DIR configurado en app.py: {DATA_DIR}")
+print(f"app.py: DATA_DIR configurado en: {DATA_DIR}")
 
 
 # Registrar Blueprints
