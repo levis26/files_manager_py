@@ -1,722 +1,766 @@
-/* Define CSS variables for colors for easier management */
-:root {
-    --primary-color: #2563eb; /* Modern blue */
-    --primary-color-rgb: 37, 99, 235; /* RGB values for rgba() */
-    --secondary-color: #64748b; /* Modern secondary */
-    --secondary-color-rgb: 100, 116, 139; /* RGB values for rgba() */
-    --success-color: #10b981; /* Modern success */
-    --danger-color: #ef4444; /* Modern danger */
-    --danger-color-rgb: 239, 68, 68; /* RGB values for rgba() */
-    --warning-color: #f59e0b; /* Modern warning */
-    --info-color: #3b82f6; /* Modern info */
+/* Aquí definimos variables en CSS. Es como tener "apodos" para colores, tamaños, etc.
+   Nos ayuda a mantener la consistencia: si decidimos cambiar el color primario,
+   solo lo cambiamos aquí y se actualiza en toda la hoja de estilos donde usemos --primary-color.
+   ¡Hace el código más fácil de mantener y entender! */
+   :root {
+    /* Colores principales, basados en una paleta moderna */
+    --primary-color: #2563eb; /* Un azul vibrante para elementos principales */
+    --primary-color-rgb: 37, 99, 235; /* Los valores RGB son útiles para crear colores semi-transparentes (rgba) */
+    --secondary-color: #64748b; /* Un color secundario, como un gris azulado suave */
+    --secondary-color-rgb: 100, 116, 139;
+    --success-color: #10b981; /* Verde para indicar éxito o acciones positivas */
+    --danger-color: #ef4444; /* Rojo para errores o acciones peligrosas (borrar) */
+    --danger-color-rgb: 239, 68, 68;
+    --warning-color: #f59e0b; /* Naranja para advertencias */
+    --info-color: #3b82f6; /* Azul claro para información */
 
-    --light-blue-bg: #f1f5f9; /* Modern light blue */
-    --light-grey-bg: #f8fafc; /* Modern light grey */
-    --medium-grey-border: #e2e8f0; /* Modern medium grey */
-    --light-grey-border: #f1f5f9; /* Modern light grey */
-    --dark-blue-text: #1e293b; /* Modern dark blue */
-    --primary-text: #334155; /* Modern primary text */
-    --secondary-text: #64748b; /* Modern secondary text */
-    --muted-text: #94a3b8; /* Modern muted text */
+    /* Colores de fondo y bordes */
+    --light-blue-bg: #f1f5f9; /* Un fondo azul muy claro */
+    --light-grey-bg: #f8fafc; /* Un fondo gris muy claro */
+    --medium-grey-border: #e2e8f0; /* Un gris medio para bordes */
+    --light-grey-border: #f1f5f9; /* Un gris claro para bordes */
 
-    --folder-icon-color: #fbbf24; /* Modern folder color */
-    --file-icon-color: #3b82f6; /* Modern file color */
-    --up-icon-color: #64748b; /* Modern up arrow color */
+    /* Colores de texto */
+    --dark-blue-text: #1e293b; /* Un azul oscuro para títulos o texto importante */
+    --primary-text: #334155; /* El color principal para la mayoría del texto */
+    --secondary-text: #64748b; /* Un color más suave para texto secundario */
+    --muted-text: #94a3b8; /* Gris para texto menos prominente o indicaciones */
 
-    --border-radius-sm: 0.375rem;
-    --border-radius-md: 0.75rem;
-    --border-radius-lg: 1rem;
-    --border-radius-xl: 1.25rem;
+    /* Colores específicos de iconos */
+    --folder-icon-color: #fbbf24; /* Color para los iconos de carpeta */
+    --file-icon-color: #3b82f6; /* Color para los iconos de archivo */
+    --up-icon-color: #64748b; /* Color para el icono de "subir nivel" */
 
-    --spacing-unit: 1.75rem; /* Larger spacing unit for better hierarchy */
+    /* Variables para los radios de borde (esquinas redondeadas) */
+    --border-radius-sm: 0.375rem; /* Pequeño */
+    --border-radius-md: 0.75rem; /* Medio */
+    --border-radius-lg: 1rem;    /* Grande */
+    --border-radius-xl: 1.25rem; /* Extra grande */
+
+    /* Variable para definir una unidad de espaciado base.
+       Usarla para márgenes y paddings ayuda a tener un ritmo vertical consistente. */
+    --spacing-unit: 1.75rem; /* Una unidad de espaciado un poco más grande para una mejor jerarquía visual */
+
+    /* Colores para el gradiente del fondo del cuerpo */
     --gradient-start: #f1f5f9;
     --gradient-end: #e2e8f0;
+
+    /* Opacidad para el efecto "cristal" en la tarjeta principal */
     --glass-opacity: 0.85;
 }
 
 
-/* Estilos generales para el cuerpo */
+/* Estilos generales para el cuerpo (body) de la página */
 body {
+    /* Fondo con un gradiente suave usando nuestras variables */
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    color: var(--primary-text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 2rem 0;
+    font-family: 'Inter', sans-serif; /* Usamos una fuente moderna */
+    line-height: 1.6; /* Espaciado entre líneas para mejor legibilidad */
+    color: var(--primary-text); /* Color principal del texto */
+    min-height: 100vh; /* Aseguramos que el cuerpo ocupe al menos el alto completo de la ventana */
+    display: flex; /* Usamos flexbox para que el contenedor principal (.container) pueda estirarse */
+    flex-direction: column; /* Apilamos los elementos hijos (el contenedor principal) verticalmente */
+    padding: 2rem 0; /* Añadimos un padding arriba y abajo */
 }
 
-/* Estilos para el contenedor principal de Bootstrap */
+/* Estilos para el contenedor principal de Bootstrap que envuelve el contenido de la página */
 .container {
-    margin-top: var(--spacing-unit); /* Use CSS variable */
-    margin-bottom: var(--spacing-unit); /* Use CSS variable */
-    flex-grow: 1; /* Allow container to grow and fill vertical space */
+    /* Usamos nuestra variable de espaciado para márgenes arriba y abajo */
+    margin-top: var(--spacing-unit);
+    margin-bottom: var(--spacing-unit);
+    flex-grow: 1; /* ¡Importante! Permite que el contenedor crezca y llene todo el espacio vertical disponible.
+                     Esto, junto con el 'display: flex' en el body, hace que el footer (si hubiera) se quede abajo
+                     y el contenido principal se estire. */
 }
 
-/* Estilos para la tarjeta principal que envuelve todo */
+/* Estilos para la tarjeta principal (el recuadro grande) que contiene toda la interfaz */
 .card {
-    border: none;
+    border: none; /* Quitamos el borde por defecto de Bootstrap */
+    /* Fondo semi-transparente para el efecto "glassmorphism" */
     background: rgba(255, 255, 255, var(--glass-opacity));
+    /* Añadimos un filtro de desenfoque detrás del elemento para el efecto glass */
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: var(--border-radius-xl);
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(10px); /* Prefijo para compatibilidad con navegadores Webkit (Chrome, Safari) */
+    border-radius: var(--border-radius-xl); /* Esquinas bien redondeadas usando nuestra variable */
+    overflow: hidden; /* Asegura que nada se salga de las esquinas redondeadas */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); /* Una sombra suave pero prominente */
+    display: flex; /* Usamos flexbox para organizar el contenido dentro de la tarjeta */
+    flex-direction: column; /* Apilamos la cabecera, el cuerpo y el pie (si hubiera) verticalmente */
+    height: 100%; /* La tarjeta ocupará el 100% del alto de su contenedor (.container) */
+    transition: all 0.3s ease; /* Transición suave para los efectos al pasar el ratón */
 }
 
+/* Efecto al pasar el ratón sobre la tarjeta */
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px); /* La tarjeta se mueve ligeramente hacia arriba */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15); /* La sombra se hace un poco más grande/oscura */
 }
 
-/* Estilos para la cabecera de la tarjeta (donde está el título y buscador) */
+/* Estilos para la cabecera de la tarjeta (la barra donde están el título y el buscador) */
 .card-header {
+    /* Un gradiente suave para el fondo de la cabecera */
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.95));
-    border-bottom: 1px solid var(--medium-grey-border);
+    border-bottom: 1px solid var(--medium-grey-border); /* Un borde sutil en la parte inferior */
+    /* Padding usando nuestra unidad de espaciado */
     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit);
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
+    flex-shrink: 0; /* Evita que la cabecera se encoja si el contenido del card-body crece mucho */
+    position: relative; /* Necesario para posicionar el pseudo-elemento ::before */
+    overflow: hidden; /* Oculta cualquier cosa que se salga de los límites del header */
 }
 
+/* Estilos para el pseudo-elemento que crea un efecto visual sutil al pasar el ratón por la cabecera */
 .card-header::before {
-    content: '';
-    position: absolute;
+    content: ''; /* Los pseudo-elementos necesitan 'content', aunque esté vacío */
+    position: absolute; /* Posicionamiento absoluto dentro del .card-header (que es relative) */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    /* Un gradiente semi-transparente que se superpone */
     background: linear-gradient(45deg, rgba(37, 99, 235, 0.1), rgba(147, 197, 253, 0.1));
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    opacity: 0; /* Inicialmente invisible */
+    transition: opacity 0.3s ease; /* Transición suave para que aparezca */
 }
 
+/* Hace que el pseudo-elemento sea visible al pasar el ratón sobre la cabecera */
 .card-header:hover::before {
     opacity: 1;
 }
 
+/* Estilos para el título dentro de la cabecera (elementos con clase fs-4) */
 .card-header .fs-4 {
-    font-weight: 600;
-    color: var(--dark-blue-text);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-weight: 600; /* Un poco más negrita */
+    color: var(--dark-blue-text); /* Color azul oscuro */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Una sombra de texto muy sutil */
 }
 
-/* Estilos para el input group del buscador */
-.input-group {
-    border-radius: var(--border-radius-md); /* Bordes redondeados para el input group */
-    overflow: hidden; /* Asegura que los bordes redondeados se apliquen a los contenidos */
+/* Estilos para el sidebar (la barra lateral izquierda) */
+.sidebar {
+    background: white; /* Fondo blanco */
+    border-right: 1px solid var(--medium-grey-border); /* Un borde derecho sutil */
+    transition: all 0.3s ease; /* Transición para efectos */
+    padding: 1.5rem 1rem; /* Espaciado interno */
 }
 
-.input-group-text {
-    background-color: var(--light-grey-bg); /* Fondo blanco para el icono */
-    border-right: none !important;
-    border-color: var(--medium-grey-border); /* Color de borde estándar de form-control */
+/* Efecto al pasar el ratón sobre el sidebar */
+.sidebar:hover {
+    /* Un ligero cambio de fondo a un gradiente suave */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.95));
 }
 
-.form-control {
-    border-left: none !important;
-    border-color: var(--medium-grey-border); /* Color de borde estándar */
-    box-shadow: none !important; /* Eliminar box-shadow por defecto al enfocar */
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Add smooth transition */
+/* Estilos para los títulos dentro del sidebar (h5) */
+.sidebar h5 {
+    color: var(--primary-color); /* Color primario */
+    font-weight: 600; /* Negrita */
+    margin-bottom: 1.5rem; /* Espacio abajo */
+    padding-bottom: 0.5rem; /* Espacio abajo del texto antes del borde */
+    border-bottom: 2px solid rgba(var(--primary-color-rgb), 0.2); /* Un borde inferior grueso y semi-transparente */
 }
 
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25) !important;
-    transform: scale(1.02);
+/* Estilos para los botones de acción del sidebar (elementos con clase list-group-item-action) */
+.list-group-item-action {
+    border: 2px solid var(--medium-grey-border); /* Borde */
+    background: white; /* Fondo */
+    color: var(--primary-text); /* Color de texto */
+    transition: all 0.3s ease; /* Transición para efectos */
+    padding: 0.375rem 0.75rem; /* Espaciado más compacto */
+    font-size: 0.9rem; /* Tamaño de fuente más pequeño */
+    min-width: 100%; /* Aseguramos que ocupen todo el ancho disponible */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espaciado entre icono y texto */
 }
 
-
-/* Estilos para el cuerpo de la tarjeta (contiene sidebar, browser, preview) */
-.card-body {
-    padding: 0;
-    display: flex; /* Use flexbox for the row inside card body */
-    flex-direction: column; /* Stack row vertically if needed */
-    flex-grow: 1; /* Allow card body to grow and fill remaining space */
-}
-
-/* Ensure the row inside card-body takes full height */
-.card-body > .row.g-0 {
-    flex-grow: 1;
-}
-
-/* Estilos para la barra lateral de acciones */
-.sidebar { /* Use the new class */
-    border-right: 1px solid var(--medium-grey-border); /* Borde sutil */
-    background-color: var(--light-grey-bg); /* Slightly different background */
-}
-
-.list-group-flush .list-group-item {
-    border-width: 0 0 1px 0;
-    border-color: var(--light-grey-border); /* Color de borde más claro */
-    padding: calc(var(--spacing-unit) * 0.6) var(--spacing-unit); /* Adjust padding */
-    font-weight: 500; /* Medium weight */
-    color: var(--secondary-text); /* Color de texto más suave */
-    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Add smooth transition */
-}
-
-.list-group-flush .list-group-item:last-child {
-    border-bottom-width: 0;
-}
-
+/* Efecto al pasar el ratón sobre los botones del sidebar */
 .list-group-item-action:hover {
-    color: var(--primary-color);
-    background-color: rgba(var(--primary-color-rgb), 0.05); /* Subtle hover background using primary color */
+    background-color: var(--light-blue-bg); /* Fondo más claro al pasar el ratón */
+    border-color: var(--primary-color); /* Borde más destacado */
+    color: var(--primary-color); /* Texto en color primario */
+    padding: 0.375rem 0.75rem; /* Mantenemos el espaciado compacto */
 }
 
+/* Efecto al recibir el foco (por ejemplo, con el tabulador) */
+.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); /* Un anillo azul alrededor del botón */
+    background: rgba(var(--primary-color-rgb), 0.1); /* Fondo azul claro */
+    color: var(--primary-color); /* Color de texto primario */
+    outline: none; /* Quitamos el contorno por defecto del navegador */
+}
+
+/* Efecto al hacer clic (estado activo) */
 .list-group-item-action:active {
-     background-color: rgba(var(--primary-color-rgb), 0.1); /* More pronounced active background */
-     color: var(--dark-blue-text);
+    background: rgba(var(--primary-color-rgb), 0.2); /* Fondo azul más oscuro semi-transparente */
+    color: var(--primary-color); /* Color de texto primario */
+    transform: translateX(5px); /* Se mantiene movido a la derecha */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Mantiene la sombra */
+    font-size: 1.1rem; /* Tamaño del icono */
+    width: 1.8rem; /* Ancho fijo para ayudar a alinear los nombres */
+    text-align: center; /* Centramos el icono */
 }
 
-/* Add a separator between the sidebar and the main content on larger screens */
-@media (min-width: 768px) {
-    .sidebar {
-        border-right: 1px solid var(--medium-grey-border) !important; /* Ensure border is visible */
-    }
+#updateButton {
+    background: white; /* Fondo blanco */
+    border: 1px solid var(--medium-grey-border); /* Borde */
+    color: var(--primary-color); /* Color de texto primario */
+    transition: all 0.3s ease; /* Transición para efectos */
+    font-size: 0.9rem; /* Tamaño de fuente consistente con los otros botones */
+    padding: 0.375rem 0.75rem; /* Espaciado más compacto, consistente con los otros botones */
+    border-radius: var(--border-radius-sm); /* Esquinas redondeadas */
+    white-space: nowrap; /* Evita que el texto se parta */
+    min-width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espaciado entre icono y texto */
 }
 
-
-/* Estilos para el área del navegador y previsualización */
-.browser-pane { /* Use the new class */
-     border-right: 1px solid var(--medium-grey-border); /* Borde sutil */
+#updateButton:hover {
+    background: var(--light-blue-bg); /* Fondo más claro */
+    border-color: var(--primary-color); /* Borde más destacado */
+    color: var(--primary-color); /* Texto en color primario */
+    transform: translateY(-2px); /* Se mueve un poco hacia arriba */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+    padding: 0.375rem 0.75rem; /* Mantenemos el espaciado compacto */
 }
 
-/* Estilos para la cabecera del navegador y previsualización */
-.h5.mb-0 {
-    font-weight: 600; /* Semibold */
-    color: var(--dark-blue-text); /* Azul oscuro */
+#updateButton:active {
+    transform: translateY(0); /* Vuelve a su posición original */
+    background: var(--primary-color); /* Fondo en color primario */
+    border-color: var(--primary-color); /* Borde en color primario */
+    color: white; /* Texto en blanco para mejor contraste */
+    padding: 0.375rem 0.75rem; /* Mantenemos el espaciado compacto */
 }
 
-#currentPath {
-     color: var(--primary-color); /* Azul primario para la ruta */
-     font-weight: 600;
-}
+/* Colores específicos para los iconos de carpeta, archivo y "subir nivel" */
+#browser-content .list-group-item i.bi-folder-fill { color: var(--folder-icon-color); }
+#browser-content .list-group-item i.bi-file-earmark-fill { color: var(--file-icon-color); }
+#browser-content .list-group-item i.bi-arrow-up-circle-fill { color: var(--up-icon-color); }
 
-
-/* Estilos para los elementos de la lista del explorador (usando list-group) */
-#browser-content .list-group-item {
-    border-bottom: 1px solid var(--light-grey-border); /* Borde sutil */
-    padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit); /* Adjust padding */
-    font-weight: 400; /* Regular weight */
-    color: var(--primary-text);
-    transition: background-color 0.2s ease-in-out; /* Add smooth transition */
-}
-
-#browser-content .list-group-item:hover {
-    background-color: var(--light-grey-bg);
-}
-
-/* Style for the selected item */
-#browser-content .list-group-item.list-group-item-primary {
-    background-color: rgba(var(--primary-color-rgb), 0.15); /* More prominent selection background */
-    border-color: var(--primary-color);
-    font-weight: 500; /* Medium weight */
-    color: var(--dark-blue-text);
-}
-
-/* Styles for icons within list items */
-#browser-content .list-group-item i.bi {
-    font-size: 1.1rem;
-    width: 1.8rem; /* Increase width for better alignment */
-    text-align: center;
-}
-
-#browser-content .list-group-item i.bi-folder-fill { color: var(--folder-icon-color); } /* Folder icon color */
-#browser-content .list-group-item i.bi-file-earmark-fill { color: var(--file-icon-color); } /* File icon color */
-#browser-content .list-group-item i.bi-arrow-up-circle-fill { color: var(--up-icon-color); } /* Up level icon color */
-
-/* Style for the action buttons group within list items */
+/* Estilos para el grupo de botones pequeños (renombrar, borrar) que aparecen en cada elemento de la lista */
 #browser-content .list-group-item .btn-group-sm {
-    opacity: 0; /* Initially hide action buttons */
-    transition: opacity 0.2s ease-in-out; /* Add transition */
+    opacity: 0; /* Inicialmente ocultos */
+    transition: opacity 0.2s ease-in-out; /* Transición suave para que aparezcan */
 }
 
+/* Hace visibles los botones pequeños al pasar el ratón sobre el elemento de la lista o al seleccionarlo */
 #browser-content .list-group-item:hover .btn-group-sm,
 #browser-content .list-group-item.list-group-item-primary .btn-group-sm {
-    opacity: 1; /* Show action buttons on hover or when selected */
+    opacity: 1;
 }
 
+/* Estilos para los botones individuales dentro del grupo pequeño */
 #browser-content .list-group-item .btn-group-sm > .btn {
-    padding: 0.25rem 0.5rem; /* Adjusted padding */
-    font-size: 0.8rem; /* Slightly smaller font size */
-    border-radius: var(--border-radius-sm); /* Adjusted border-radius */
-    color: var(--secondary-color); /* Default button color */
-    border-color: var(--medium-grey-border);
-    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
-    backdrop-filter: blur(2px); /* Add a subtle blur effect behind buttons */
+    padding: 0.25rem 0.5rem; /* Espaciado interno reducido */
+    font-size: 0.8rem; /* Tamaño de fuente más pequeño */
+    border-radius: var(--border-radius-sm); /* Esquinas redondeadas pequeñas */
+    color: var(--secondary-color); /* Color de texto secundario por defecto */
+    border-color: var(--medium-grey-border); /* Color del borde */
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+    backdrop-filter: blur(2px); /* Un ligero desenfoque detrás del botón (efecto vidrio pequeño) */
 }
 
+/* Efecto hover en los botones pequeños */
 #browser-content .list-group-item .btn-group-sm > .btn:hover {
-    color: var(--primary-color);
-    border-color: var(--primary-color);
-    background-color: rgba(var(--primary-color-rgb), 0.1);
+    color: var(--primary-color); /* Color de texto primario */
+    border-color: var(--primary-color); /* Borde primario */
+    background-color: rgba(var(--primary-color-rgb), 0.1); /* Fondo azul claro */
 }
 
+/* Efecto hover específico para el botón de peligro (borrar) */
 #browser-content .list-group-item .btn-group-sm > .btn-outline-danger:hover {
-    color: var(--danger-color);
-    border-color: var(--danger-color);
-    background-color: rgba(var(--danger-color-rgb), 0.1);
+    color: var(--danger-color); /* Color de texto peligro */
+    border-color: var(--danger-color); /* Borde peligro */
+    background-color: rgba(var(--danger-color-rgb), 0.1); /* Fondo rojo claro */
 }
 
-/* Styles for placeholder content (loading, empty, initial preview, error) */
+/* Estilos para los mensajes de estado (cargando, vacío, preview inicial, error) */
 .loading-state, .empty-state, .initial-preview-state, .preview-error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%; /* Ensure placeholders take full height of their container */
-    text-align: center;
-    color: var(--muted-text);
-    padding: var(--spacing-unit); /* Add padding to placeholders */
+    display: flex; /* Usamos flexbox para centrar contenido */
+    flex-direction: column; /* Apilamos contenido verticalmente */
+    align-items: center; /* Centramos horizontalmente */
+    justify-content: center; /* Centramos verticalmente */
+    width: 100%; /* Ocupan todo el ancho */
+    height: 100%; /* ¡Importante! Ocupan todo el alto de su contenedor para centrar bien */
+    text-align: center; /* Centramos el texto */
+    color: var(--muted-text); /* Color de texto discreto */
+    padding: var(--spacing-unit); /* Espaciado interno */
 }
 
+/* Espacio debajo del spinner en el estado de carga */
 .loading-state .spinner-border {
     margin-bottom: var(--spacing-unit) * 0.5;
 }
 
+/* Tamaño de iconos grandes para los estados vacío/error/inicial */
 .initial-preview-state i.bi,
 .preview-error-state i.bi,
 .empty-state i.bi {
-    font-size: 3rem; /* Larger icons for empty/error states */
-    margin-bottom: var(--spacing-unit) * 0.5;
+    font-size: 3rem; /* Iconos grandes */
+    margin-bottom: var(--spacing-unit) * 0.5; /* Espacio debajo del icono */
 }
 
+/* Color rojo para el texto de error */
 .preview-error-state .text-danger {
     color: var(--danger-color) !important;
 }
 
 
-/* Estilos para el área de previsualización */
+/* Estilos para el área de previsualización de archivos */
 #file-preview {
-    background-color: var(--light-grey-bg); /* Fondo blanco grisáceo */
+    background-color: var(--light-grey-bg); /* Fondo gris claro */
     border: 1px solid var(--medium-grey-border); /* Borde sutil */
-    border-radius: var(--border-radius-md); /* Bordes redondeados */
-    font-family: 'Courier New', monospace; /* Monospace font for code/text */
-    white-space: pre-wrap; /* Wrap long lines */
-    word-wrap: break-word; /* Break long words */
-    font-size: 0.95rem; /* Slightly larger font size */
-    color: var(--primary-text);
-    padding: var(--spacing-unit); /* Adjust padding */
-    min-height: 200px; /* Keep minimum height */
-    /* Ensure flex properties align content correctly */
+    border-radius: var(--border-radius-md); /* Esquinas redondeadas */
+    font-family: 'Courier New', monospace; /* Fuente monoespaciada para código/texto */
+    white-space: pre-wrap; /* Envuelve líneas largas que contienen espacios en blanco */
+    word-wrap: break-word; /* Envuelve palabras largas si exceden el ancho */
+    font-size: 0.95rem; /* Tamaño de fuente ligeramente más grande */
+    color: var(--primary-text); /* Color de texto principal */
+    padding: var(--spacing-unit); /* Espaciado interno */
+    min-height: 200px; /* Altura mínima aunque no haya contenido */
+    /* Propiedades flexbox para organizar el contenido interno (ej. ruta y pre) */
     display: flex;
     flex-direction: column;
-    /* Removed justify-content/align-items/text-align from here
-       as they are handled by placeholder states or pre tag */
-    gap: 0.5rem; /* Add gap between flex items (like path and content) */
+    gap: 0.5rem; /* Espacio entre los elementos internos (como la ruta y el bloque de código) */
 }
 
-/* Estilos para el bloque <pre> dentro de la previsualización normal */
+/* Estilos para la etiqueta <pre> dentro del área de previsualización (donde se muestra el contenido del archivo) */
 #file-preview pre {
-    margin: 0;
-    border: 1px solid #ced4da; /* Add a border to the content area */
-    background-color: #e9ecef; /* Slightly grey background */
-    padding: var(--spacing-unit) * 0.8; /* Add padding inside the content block */
-    flex-grow: 1;
-    width: 100%;
-    text-align: left; /* Align text to the left for actual content */
-    color: var(--primary-text); /* Darker text color for content */
-    border-radius: var(--border-radius-sm); /* Slightly rounded corners */
-    overflow: auto; /* Ensure scrollbar for content */
-    font-size: 0.9rem; /* Slightly smaller font size for code block */
+    margin: 0; /* Quitamos el margen por defecto de <pre> */
+    border: 1px solid #ced4da; /* Borde alrededor del contenido */
+    background-color: #e9ecef; /* Fondo gris claro para el bloque de código */
+    padding: var(--spacing-unit) * 0.8; /* Espaciado interno del bloque de código */
+    flex-grow: 1; /* Permite que el bloque de código crezca y llene el espacio vertical disponible */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    text-align: left; /* Alineamos el texto a la izquierda (las previsualizaciones no suelen estar centradas) */
+    color: var(--primary-text); /* Color de texto para el contenido */
+    border-radius: var(--border-radius-sm); /* Esquinas ligeramente redondeadas */
+    overflow: auto; /* Añade scrollbars si el contenido es demasiado grande */
+    font-size: 0.9rem; /* Tamaño de fuente ligeramente más pequeño dentro del bloque de código */
 }
 
-/* Styles for the maximize preview button and preview header */
+/* Estilos para la cabecera del panel de previsualización (donde está el título y el botón de maximizar) */
 .preview-pane .d-flex.justify-content-between.align-items-center {
-    /* Ensure the title and button are on the same line by default (large screens) */
-    flex-wrap: nowrap; /* Prevent wrapping by default */
+    /* Aseguramos que el título y el botón estén en la misma línea por defecto (pantallas grandes) */
+    flex-wrap: nowrap; /* Evita que se envuelvan a la siguiente línea */
 }
 
+/* Estilos para el título (h5) dentro de la cabecera de previsualización */
 .preview-pane .d-flex.justify-content-between.align-items-center h5 {
-    /* Allow the title to shrink and truncate on large/medium screens */
+    /* Permite que el título se encoja y se trunque (con puntos suspensivos) si el nombre del archivo es muy largo */
     flex-shrink: 1;
-    min-width: 0; /* Allow content to shrink below flex basis */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0; /* Permite que el elemento se encoja por debajo de su tamaño base */
+    white-space: nowrap; /* Mantiene el texto en una sola línea */
+    overflow: hidden; /* Oculta el texto que se sale */
+    text-overflow: ellipsis; /* Añade puntos suspensivos al final si el texto se trunca */
 }
 
+/* Estilos para el botón de maximizar la previsualización */
 #maximizePreviewBtn {
-    flex-shrink: 0; /* Prevent the button from shrinking */
-    margin-left: 0.5rem; /* Add space between title and button on large/medium screens */
-    transition: visibility 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    flex-shrink: 0; /* Evita que el botón se encoja */
+    margin-left: 0.5rem; /* Añade espacio a la izquierda para separarlo del título */
+    transition: visibility 0.2s ease-in-out, opacity 0.2s ease-in-out; /* Transición suave */
 }
 
 
-/* Estilos para la barra lateral de acciones deshabilitadas */
+/* Estilos para los elementos de acción de lista deshabilitados (sidebar) */
 .list-group-item-action:disabled {
-    opacity: 0.6; /* Reduce opacity */
-    cursor: not-allowed;
-    background-color: var(--light-grey-bg); /* Slightly different background for disabled */
-    color: var(--muted-text);
+    opacity: 0.6; /* Reduce la opacidad */
+    cursor: not-allowed; /* Cambia el cursor para indicar que no se puede hacer clic */
+    background-color: var(--light-grey-bg); /* Fondo gris claro */
+    color: var(--muted-text); /* Color de texto atenuado */
 }
+/* Quitamos el efecto hover en los elementos deshabilitados */
 .list-group-item-action:disabled:hover {
-     background-color: var(--light-grey-bg); /* Prevent hover effect on disabled */
+     background-color: var(--light-grey-bg);
      color: var(--muted-text);
      cursor: not-allowed;
 }
 
 
-/* Estilos para grupos de botones pequeños (en la lista de items) */
-/* These are already styled within #browser-content list items above */
+/* Estilos para grupos de botones pequeños (ya definidos más arriba, parece una sección repetida) */
+/* Estos estilos ya están definidos dentro de #browser-content list items */
 
 
-/* Estilos para los mensajes flash (Bootstrap alerts) */
-/* Keep default Bootstrap alert styles, they are already good */
+/* Estilos para los mensajes de alerta (flash messages) de Bootstrap */
+/* Usamos los estilos por defecto de Bootstrap, que ya son buenos. */
 .alert {
+    /* Ajustamos los márgenes usando nuestra unidad de espaciado */
     margin-top: calc(var(--spacing-unit) * 0.8);
     margin-bottom: calc(var(--spacing-unit) * 0.8);
-    border-radius: var(--border-radius-md);
-    font-weight: 500;
+    border-radius: var(--border-radius-md); /* Esquinas redondeadas */
+    font-weight: 500; /* Texto un poco más negrita */
 }
 
+/* Tamaño de los iconos dentro de los mensajes de alerta */
 .alert .bi {
-    font-size: 1.2rem; /* Larger icons in alerts */
+    font-size: 1.2rem; /* Iconos un poco más grandes */
 }
 
 
-/* Ensure flex items in row take full height */
+/* Aseguramos que las columnas dentro de una fila flex (row.g-0) ocupen todo el alto disponible */
 .row.g-0 > [class*="col-"] {
-    display: flex;
-    flex-direction: column;
+    display: flex; /* Hacemos cada columna un contenedor flex */
+    flex-direction: column; /* Los elementos dentro de la columna se apilan verticalmente */
 }
 
+/* Permite que el contenido dentro de una columna crezca para llenar el alto */
 .row.g-0 .h-100 {
     flex-grow: 1;
 }
 
-/* Style for the search term highlight */
+/* Estilo para resaltar el término de búsqueda en la lista de resultados */
 .bg-warning {
-    background-color: var(--warning-color) !important;
-    color: #212529 !important; /* Dark text on yellow */
-    padding: 0.1rem 0.4rem; /* Light padding */
-    border-radius: var(--border-radius-sm); /* Rounded corners */
+    background-color: var(--warning-color) !important; /* Fondo naranja (¡importante! para sobrescribir si es necesario) */
+    color: #212529 !important; /* Texto oscuro sobre naranja */
+    padding: 0.1rem 0.4rem; /* Espaciado interno ligero */
+    border-radius: var(--border-radius-sm); /* Esquinas redondeadas */
 }
 
-/* Estilos para los modales */
+/* Estilos para los modales (ventanas emergentes) */
 .modal-content {
-    border-radius: var(--border-radius-lg) !important; /* Consistent rounded corners */
-    overflow: hidden; /* Ensure content respects border-radius */
+    border-radius: var(--border-radius-lg) !important; /* Esquinas consistentemente redondeadas (¡importante!) */
+    overflow: hidden; /* Asegura que el contenido no se salga de las esquinas redondeadas */
 }
 
+/* Estilos para la cabecera del modal */
 .modal-header {
-     border-bottom: 1px solid var(--medium-grey-border); /* Subtle border */
-     background-color: var(--light-grey-bg);
-     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Adjust padding */
+     border-bottom: 1px solid var(--medium-grey-border); /* Borde inferior sutil */
+     background-color: var(--light-grey-bg); /* Fondo gris claro */
+     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Espaciado interno */
 }
 
+/* Estilos para el título del modal */
 .modal-title {
-     font-weight: 600;
-     color: var(--dark-blue-text);
-     display: flex; /* Align icon and title */
-     align-items: center;
+     font-weight: 600; /* Negrita */
+     color: var(--dark-blue-text); /* Color azul oscuro */
+     display: flex; /* Flexbox para alinear icono y texto */
+     align-items: center; /* Centramos verticalmente icono y texto */
 }
 
+/* Estilos para el cuerpo principal del modal */
 .modal-body {
-    display: flex;
-    flex-direction: column;
-    padding: var(--spacing-unit); /* Adjust padding */
+    display: flex; /* Flexbox para organizar contenido interno */
+    flex-direction: column; /* Apilamos contenido verticalmente */
+    padding: var(--spacing-unit); /* Espaciado interno */
 }
 
+/* Estilos para las etiquetas de los formularios dentro del modal */
 .modal-body .form-label {
-    font-weight: 500; /* Medium weight for labels */
-    color: var(--secondary-text);
-    margin-bottom: 0.5rem;
+    font-weight: 500; /* Peso de fuente medio */
+    color: var(--secondary-text); /* Color de texto secundario */
+    margin-bottom: 0.5rem; /* Espacio debajo de la etiqueta */
 }
 
+/* Estilos específicos para campos de input de solo lectura dentro del modal */
 .modal-body .form-control[readonly] {
-    background-color: #e9ecef; /* Slightly greyed out background for readonly inputs */
-    opacity: 1; /* Ensure opacity is not reduced */
+    background-color: #e9ecef; /* Fondo gris claro para indicar que no se puede editar */
+    opacity: 1; /* Aseguramos que la opacidad no se reduzca (a veces pasa con readonly) */
 }
 
+/* Estilos para las áreas de texto (textareas) dentro del modal */
 .modal-body textarea.form-control {
-    font-family: 'Courier New', monospace; /* Monospace for content textareas */
-    font-size: 0.9rem;
+    font-family: 'Courier New', monospace; /* Fuente monoespaciada para código/texto */
+    font-size: 0.9rem; /* Tamaño de fuente */
 }
 
+/* Estilos para el área de previsualización de contenido al añadir a un archivo en un modal */
 #appendFileContentPreview {
-    background-color: #e9ecef; /* Slightly grey background for preview */
-    border: 1px solid var(--medium-grey-border);
-    border-radius: var(--border-radius-md);
-    padding: 0.75rem; /* Adjust padding */
-    font-size: 0.85rem;
-    color: var(--primary-text);
-    overflow: auto; /* Ensure scroll if content is large */
+    background-color: #e9ecef; /* Fondo gris claro */
+    border: 1px solid var(--medium-grey-border); /* Borde */
+    border-radius: var(--border-radius-md); /* Esquinas redondeadas */
+    padding: 0.75rem; /* Espaciado interno */
+    font-size: 0.85rem; /* Tamaño de fuente */
+    color: var(--primary-text); /* Color de texto */
+    overflow: auto; /* Añade scrollbars si el contenido es muy grande */
 }
 
+/* Estilos para el pie del modal */
 .modal-footer {
-     border-top: 1px solid var(--medium-grey-border); /* Subtle border */
-     background-color: var(--light-grey-bg);
-     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Adjust padding */
+     border-top: 1px solid var(--medium-grey-border); /* Borde superior sutil */
+     background-color: var(--light-grey-bg); /* Fondo gris claro */
+     padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); /* Espaciado interno */
 }
 
-/* Style for the maximized preview modal content */
+/* Estilos para el contenido de previsualización maximizado dentro del modal de previsualización */
 #previewModalFileContent {
-     background-color: #e9ecef; /* Slightly grey background */
-     border: 1px solid var(--medium-grey-border); /* Border */
-     border-radius: var(--border-radius-md); /* Rounded corners */
-     font-family: 'Courier New', monospace;
-     white-space: pre-wrap;
-     word-wrap: break-word;
-     font-size: 1rem;
-     color: var(--primary-text);
-     padding: var(--spacing-unit); /* Adjust padding */
-     flex-grow: 1;
-     overflow: auto;
+     background-color: #e9ecef; /* Fondo gris claro */
+     border: 1px solid var(--medium-grey-border); /* Borde */
+     border-radius: var(--border-radius-md); /* Esquinas redondeadas */
+     font-family: 'Courier New', monospace; /* Fuente monoespaciada */
+     white-space: pre-wrap; /* Envuelve líneas largas */
+     word-wrap: break-word; /* Envuelve palabras largas */
+     font-size: 1rem; /* Tamaño de fuente */
+     color: var(--primary-text); /* Color de texto */
+     padding: var(--spacing-unit); /* Espaciado interno */
+     flex-grow: 1; /* Permite que crezca para llenar el espacio */
+     overflow: auto; /* Scrollbars */
 }
 
-/* Custom scrollbar styles for a cleaner look */
-/* Works in Webkit browsers (Chrome, Safari) */
+/* Estilos personalizados para la barra de desplazamiento (scrollbar) */
+/* Esto solo funciona en navegadores basados en Webkit (Chrome, Safari). */
 .custom-scroll::-webkit-scrollbar {
-  width: 8px; /* Ancho de la barra de desplazamiento vertical */
-  height: 8px; /* Alto de la barra de desplazamiento horizontal */
+  width: 8px; /* Ancho para barras verticales */
+  height: 8px; /* Alto para barras horizontales */
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Fondo de la pista */
-  border-radius: 10px;
+  background: #f1f1f1; /* Color de fondo de la pista */
+  border-radius: 10px; /* Esquinas redondeadas para la pista */
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: #888; /* Color del "pulgar" de la barra */
-  border-radius: 10px;
+  background: #888; /* Color del "pulgar" (la parte que mueves) */
+  border-radius: 10px; /* Esquinas redondeadas para el pulgar */
 }
 
+/* Color del pulgar al pasar el ratón por encima */
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Color del "pulgar" al pasar el ratón */
-} /* <-- Added missing closing brace */
+  background: #555;
+} /* <-- ¡Aquí falta un cierre de llave '}'! Debería estar al final del bloque custom-scroll::-webkit-scrollbar-thumb:hover. */
 
 
-/* Responsive adjustments */
-/* Corrected breakpoint to target small screens up to 767.98px */
+/* --- Ajustes Responsivos ---
+   Usamos media queries para adaptar los estilos según el ancho de la pantalla.
+   Esto asegura que la interfaz se vea bien en móviles, tablets y ordenadores. */
+
+/* Estilos para pantallas pequeñas (hasta 767.98px de ancho) */
 @media (max-width: 767.98px) {
     .card-header {
-        flex-direction: column;
-        align-items: stretch !important;
+        flex-direction: column; /* Apilamos los elementos de la cabecera (título/buscador) verticalmente */
+        align-items: stretch !important; /* Estiramos los elementos al ancho completo (¡importante!) */
     }
+    /* El div que contiene el título/descripción */
     .card-header .d-flex.align-items-center {
-        margin-bottom: 0.75rem; /* Adjust space */
-        width: 100%; /* Make the title area take full width */
-        justify-content: center; /* Center title and icon */
+        margin-bottom: 0.75rem; /* Añadimos espacio debajo */
+        width: 100%; /* Ocupa todo el ancho */
+        justify-content: center; /* Centramos el contenido (título e icono) */
     }
+    /* El último div d-flex en la cabecera (el que contiene el buscador y el botón de recargar) */
     .card-header .d-flex.align-items-center:last-child {
-        margin-bottom: 0; /* Remove bottom margin for the last item (search/reload) */
+        margin-bottom: 0; /* Quitamos el margen inferior */
+        /* Nota: si se añadió flex-wrap a este div, los elementos (buscador y botón) se apilarán aquí si no caben */
     }
+     /* Quitamos margen inferior del input group si está dentro del header (posiblemente redundante con el anterior) */
      .card-header .input-group {
-        margin-bottom: 0; /* Remove bottom margin */
+        margin-bottom: 0;
     }
 
-    .sidebar { /* Use the new class */
-        border-right: none !important;
-        border-bottom: 1px solid var(--medium-grey-border); /* Horizontal border */
+    /* Estilos para los paneles principales (sidebar, navegador) en pantallas pequeñas */
+    .sidebar, .browser-pane { /* Use the new class */
+        border-right: none !important; /* Quitamos el borde derecho */
+        border-bottom: 1px solid var(--medium-grey-border); /* Añadimos un borde inferior en su lugar */
     }
-     .browser-pane { /* Use the new class */
-        border-right: none !important;
-        border-bottom: 1px solid var(--medium-grey-border); /* Horizontal border */
-    }
-    /* Ensure columns take full width on small screens */
+    /* Aseguramos que las columnas (sidebar, navegador, preview) ocupen todo el ancho disponible */
     .col-md-3, .col-md-8, .col-md-4, .col-lg-2, .col-lg-10 {
-        width: 100%;
+        width: 100%; /* Cada columna ocupa el 100% del ancho, apilándolas */
     }
 
-     /* Adjust padding on small screens */
-     /* Apply padding directly to the pane divs for consistent inner spacing */
+    /* Ajuste específico de padding (posiblemente redundante con el siguiente bloque) */
+    .col-md-3, .col-md-8, .col-md-4, .col-lg-2, .col-lg-10 {
+    padding: 1rem; /* Añade padding a las columnas - esto podría afectar el diseño si ya hay padding interno en los paneles */
+}
+
+/* Ajustar el ancho del área principal (esto parece estar fuera de lugar en una media query de max-width y usa min-width en el valor) */
+.main-content {
+    width: calc(100% - 250px); /* Esto parece querer fijar un ancho, lo cual es raro en mobile */
+    min-width: 800px; /* Un ancho mínimo alto para mobile, probablemente un error */
+}
+
+     /* Ajustar el padding interno de los paneles en pantallas pequeñas para un diseño más compacto */
      .sidebar > div,
      .browser-pane > div,
      .preview-pane > div {
-        padding: calc(var(--spacing-unit) * 0.8) !important; /* Slightly reduced padding */
+        padding: calc(var(--spacing-unit) * 0.8) !important; /* Padding ligeramente reducido */
      }
 
-
-     /* Hide action buttons in browser list on small screens to save space,
-        user can rely on selecting and using sidebar actions. */
+     /* Ocultamos los botones de acción en la lista del navegador en pantallas pequeñas */
      #browser-content .list-group-item .btn-group-sm {
-        display: none;
+        display: none; /* Los botones (renombrar/borrar) no se muestran en la lista */
      }
 
-     /* Adjust current path display on small screens */
+     /* Ajustar la visualización de la ruta actual en pantallas pequeñas */
      #currentPath {
-        display: block; /* Show path on its own line if needed */
-        font-size: 0.9rem;
+        display: block; /* Se muestra en su propia línea si es necesario */
+        font-size: 0.9rem; /* Tamaño de fuente más pequeño */
      }
+      /* Ajustar tamaño de fuente para el título del navegador y el texto atenuado */
       .h5.mb-0 .fs-5.text-muted {
-         font-size: 1rem !important; /* Adjust parent text size */
+         font-size: 1rem !important; /* Tamaño de fuente ajustado */
       }
+      /* Ajustar tamaño de iconos en la cabecera del navegador */
       .h5.mb-0 .bi {
-         font-size: 1.2rem !important; /* Adjust icon size */
+         font-size: 1.2rem !important; /* Tamaño de icono ajustado */
       }
 
-      /* Adjust modal sizes for smaller screens */
+      /* Ajustar el margen de los modales en pantallas pequeñas */
       .modal-dialog {
-        margin: calc(var(--spacing-unit) * 0.5); /* Add some margin */
+        margin: calc(var(--spacing-unit) * 0.5); /* Margen alrededor del modal */
       }
 
-      /* Preview Pane Adjustments on small screens */
+      /* Ajustes para el panel de previsualización en pantallas pequeñas */
       .preview-pane .d-flex.justify-content-between.align-items-center {
-         flex-direction: column; /* Stack title and button vertically */
-         align-items: flex-start !important; /* Align items to the start */
-         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Adjust margin */
+         flex-direction: column; /* Apilamos título y botón de maximizar verticalmente */
+         align-items: flex-start !important; /* Alineamos los elementos al inicio (izquierda) */
+         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Espacio debajo */
       }
 
+      /* Estilos para el título (h5) en la cabecera de previsualización apilada */
       .preview-pane .d-flex.justify-content-between.align-items-center h5 {
-         /* Allow title to wrap naturally when stacked on small screens */
-         white-space: normal;
-         overflow: visible;
-         text-overflow: clip;
-         margin-bottom: 0.5rem; /* Add space below title when stacked */
+         white-space: normal; /* Permitimos que el título se envuelva a la siguiente línea */
+         overflow: visible; /* Aseguramos que no se corte */
+         text-overflow: clip; /* Sin puntos suspensivos al cortar */
+         margin-bottom: 0.5rem; /* Espacio debajo del título cuando está apilado */
       }
 
+      /* Estilos para el botón de maximizar en la cabecera de previsualización apilada */
       #maximizePreviewBtn {
-         margin-left: 0; /* Remove left margin when stacked */
-         align-self: flex-end; /* Align button to the end of the container */
-         /* If you want it directly below the title aligned left, use align-self: flex-start; */
+         margin-left: 0; /* Quitamos el margen izquierdo */
+         align-self: flex-end; /* Alineamos el botón al final (derecha) del contenedor padre (el div d-flex apilado) */
+         /* Si se quisiera alinear a la izquierda debajo del título, se usaría align-self: flex-start; */
       }
 
-      /* Further adjustments for extra small screens (under 576px) if needed */
+      /* Ajustes adicionales para pantallas extra pequeñas (menos de 576px) si es necesario */
       @media (max-width: 575.98px) {
-          /* Smaller padding for tighter layout */
+          /* Padding aún más reducido para un diseño más ajustado */
            .sidebar > div,
            .browser-pane > div,
            .preview-pane > div {
               padding: calc(var(--spacing-unit) * 0.6) !important;
            }
       }
-} /* <-- Added missing closing brace */
+} /* <-- ¡Cierre de llave de la media query de max-width! */
 
-/* Add a medium breakpoint for better control */
-@media (min-width: 768px) and (max-width: 991.98px) { /* For medium screens */
+/* Estilos para pantallas medianas (entre 768px y 991.98px de ancho) */
+@media (min-width: 768px) and (max-width: 991.98px) {
     .card-header {
-        flex-direction: column; /* Stack title and search */
-        align-items: stretch !important;
+        flex-direction: column; /* Apilamos los elementos de la cabecera verticalmente (título y buscador) */
+        align-items: stretch !important; /* Estiramos al ancho completo */
     }
+    /* El div que contiene el título/descripción */
     .card-header .d-flex.align-items-center {
-        margin-bottom: 0.75rem; /* Add space between stacked items */
-        width: 100%; /* Make title area take full width */
-        justify-content: center; /* Center title and icon */
+        margin-bottom: 0.75rem; /* Espacio debajo */
+        width: 100%; /* Ocupa todo el ancho */
+        justify-content: center; /* Centramos contenido */
     }
+    /* El último div d-flex en la cabecera (buscador y recargar) */
     .card-header .d-flex.align-items-center:last-child {
-        margin-top: 0; /* No top margin when stacked */
-        margin-bottom: 0; /* Remove bottom margin */
-        width: 100%; /* Make search/reload take full width */
+        margin-top: 0; /* Quitamos margen superior */
+        margin-bottom: 0; /* Quitamos margen inferior */
+        width: 100%; /* Ocupa todo el ancho */
+        /* Nota: Si este div tiene flex-wrap, y el buscador y el botón no caben en una línea,
+           se apilarán aquí, y el botón podría ocupar todo el ancho si no se controla. */
     }
+    /* Espacio debajo del input group en la cabecera apilada */
     .card-header .input-group {
-        margin-bottom: 0.75rem; /* Add space below search */
+        margin-bottom: 0.75rem; /* Espacio debajo del buscador */
     }
+    /* Estilo específico para un botón con clase btn-outline-secondary en la cabecera (¿el botón de recargar?) */
+    /* Ojo: El botón de recargar tiene la clase btn-outline-primary, esta regla podría no aplicar o estar desactualizada. */
     .card-header .btn-outline-secondary {
-        width: 100%; /* Make reload button full width */
-        text-align: center;
+        width: 100%; /* Hace que el botón ocupe todo el ancho si está apilado */
+        text-align: center; /* Centra el texto del botón */
     }
 
 
-    .sidebar {
-        border-right: 1px solid var(--medium-grey-border); /* Keep border */
-    }
-     .browser-pane {
-        border-right: 1px solid var(--medium-grey-border); /* Keep border */
+    /* Mantenemos los bordes entre paneles en pantallas medianas */
+    .sidebar, .browser-pane {
+        border-right: 1px solid var(--medium-grey-border) !important;
     }
 
-     /* Adjust column widths for medium screens if necessary, though Bootstrap defaults are usually fine */
+     /* Ajustar anchos de columna si es necesario (Bootstrap md defaults suelen ser 25%, 66.6%, 33.3%) */
     .col-md-3 { width: 25%; } /* Bootstrap default */
     .col-md-8 { width: 66.666667%; } /* Bootstrap default */
     .col-md-4 { width: 33.333333%; } /* Bootstrap default */
 
-     /* Adjust padding for medium screens */
+     /* Ajustar padding interno de los paneles en pantallas medianas al valor estándar */
      .sidebar > div,
      .browser-pane > div,
      .preview-pane > div {
-        padding: var(--spacing-unit) !important; /* Standard padding */
+        padding: var(--spacing-unit) !important; /* Padding estándar */
      }
 
-
-      /* Show action buttons on hover/select in browser list on medium screens */
+      /* Mostramos los botones de acción en la lista del navegador al pasar el ratón/seleccionar */
      #browser-content .list-group-item .btn-group-sm {
-        display: flex; /* Ensure buttons are displayed */
+        display: flex; /* Asegura que se muestren como flex items */
      }
 
-     /* Preview Pane Adjustments on medium screens */
+     /* Ajustes para el panel de previsualización en pantallas medianas */
       .preview-pane .d-flex.justify-content-between.align-items-center {
-         /* Title and button on the same line, allow title to truncate */
-         flex-wrap: nowrap;
-         align-items: center !important;
-         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Adjust margin */
+         /* Título y botón de maximizar en la misma línea, permitimos truncar el título */
+         flex-wrap: nowrap; /* Evita que se envuelvan */
+         align-items: center !important; /* Alineamos verticalmente */
+         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Espacio debajo */
       }
+      /* Estilos para el título (h5) en la cabecera de previsualización en una sola línea */
       .preview-pane .d-flex.justify-content-between.align-items-center h5 {
-         white-space: nowrap;
-         overflow: hidden;
-         text-overflow: ellipsis;
-         margin-bottom: 0; /* No bottom margin when on same line */
+         white-space: nowrap; /* Mantiene en una línea */
+         overflow: hidden; /* Oculta el exceso */
+         text-overflow: ellipsis; /* Puntos suspensivos */
+         margin-bottom: 0; /* Quitamos el margen inferior */
       }
+       /* Estilos para el botón de maximizar en pantallas medianas */
        #maximizePreviewBtn {
-         margin-left: 0.5rem; /* Add margin */
-         align-self: auto; /* Reset align-self */
+         margin-left: 0.5rem; /* Añadimos margen a la izquierda */
+         align-self: auto; /* Reseteamos align-self (hereda del contenedor) */
       }
 }
 
-/* Add a large breakpoint adjustment */
-@media (min-width: 992px) { /* For large and extra-large screens */
-    .sidebar {
-        border-right: 1px solid var(--medium-grey-border); /* Keep border */
+/* Estilos para pantallas grandes (992px en adelante) */
+@media (min-width: 992px) {
+    /* Mantenemos los bordes entre paneles */
+    .sidebar, .browser-pane {
+        border-right: 1px solid var(--medium-grey-border);
     }
-     .browser-pane {
-        border-right: 1px solid var(--medium-grey-border); /* Keep border */
-    }
-     /* Adjust column widths for large screens */
-    .col-lg-2 { width: 16.666667%; } /* Sidebar takes 2 columns */
-    .col-lg-10 { width: 83.333333%; } /* Main content takes 10 columns */
-    /* Further split the 10 columns into browser (8) and preview (4) */
+     /* Ajustar anchos de columna para pantallas grandes (layout de 3 paneles: sidebar, browser, preview) */
+    .col-lg-2 { width: 16.666667%; } /* Sidebar ocupa 2 columnas de 12 (1/6) */
+    .col-lg-10 { width: 83.333333%; } /* El contenido principal (browser + preview) ocupa 10 columnas (5/6) */
+    /* Ahora, dentro de esas 10 columnas, dividimos el navegador (col-md-8) y la previsualización (col-md-4) */
+    /* Ojo: Se usan clases col-md-x pero dentro de una media query de col-lg, esto podría ser confuso o incorrecto
+       si las clases col-md-x no se anulan correctamente en lg. Deberían usarse col-lg-x. */
     .main-content > .row.g-0 > .col-md-8 {
-         width: calc(8/10 * 100%); /* Browser takes 8/10 of the main content width */
+         width: calc(8/10 * 100%); /* El navegador toma 8 de las 10 "columnas" del contenido principal */
     }
     .main-content > .row.g-0 > .col-md-4 {
-         width: calc(2/10 * 100%); /* Preview takes 2/10 of the main content width */
+         width: calc(2/10 * 100%); /* La previsualización toma 2 de las 10 "columnas" del contenido principal (¡nota: es 2/10 no 4/10!) */
     }
 
 
-     /* Adjust padding for large screens */
+     /* Ajustar padding interno de los paneles en pantallas grandes al valor estándar */
      .sidebar > div,
      .browser-pane > div,
      .preview-pane > div {
-        padding: var(--spacing-unit) !important; /* Standard padding */
+        padding: var(--spacing-unit) !important; /* Padding estándar */
      }
 
-
-      /* Show action buttons on hover/select in browser list on large screens */
+      /* Mostramos los botones de acción en la lista del navegador al pasar el ratón/seleccionar */
      #browser-content .list-group-item .btn-group-sm {
-        display: flex; /* Ensure buttons are displayed */
+        display: flex; /* Asegura que se muestren */
      }
 
-     /* Preview Pane Adjustments on large screens */
+     /* Ajustes para el panel de previsualización en pantallas grandes (igual que medianas) */
       .preview-pane .d-flex.justify-content-between.align-items-center {
-         /* Title and button on the same line, allow title to truncate */
          flex-wrap: nowrap;
          align-items: center !important;
-         margin-bottom: calc(var(--spacing-unit) * 0.8) !important; /* Adjust margin */
+         margin-bottom: calc(var(--spacing-unit) * 0.8) !important;
       }
       .preview-pane .d-flex.justify-content-between.align-items-center h5 {
            white-space: nowrap;
            overflow: hidden;
            text-overflow: ellipsis;
-           margin-bottom: 0; /* No bottom margin when on same line */
+           margin-bottom: 0;
       }
        #maximizePreviewBtn {
-         margin-left: 0.5rem; /* Add margin */
-         align-self: auto; /* Reset align-self */
+         margin-left: 0.5rem;
+         align-self: auto;
       }
 }
 
 
-/* Ensure sticky footer (if you add one) or content pushing to bottom */
+/* Asegurar que el cuerpo use flexbox en columna para empujar el footer hacia abajo si el contenido no llena la pantalla */
 body {
-    display: flex;
-    flex-direction: column;
+    display: flex; /* Ya estaba definido arriba, repetido */
+    flex-direction: column; /* Ya estaba definido arriba, repetido */
 }
+/* Permitir que el contenedor principal crezca y llene el espacio vertical (ya definido arriba, repetido) */
 .container {
     flex-grow: 1;
 }

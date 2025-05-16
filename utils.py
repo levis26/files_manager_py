@@ -1,164 +1,193 @@
-import os
-import shutil
+import os # Este módulo es nuestro mejor amigo para todo lo relacionado con el sistema de archivos y rutas. ¡Lo necesitamos para todo!
+import shutil # Importamos 'shutil', aunque en este archivo no lo usamos directamente, se importa aquí porque está relacionado con operaciones de archivos que otras partes del proyecto sí usan (como borrar directorios recursivamente en modification.py).
 
-# Variable global para almacenar la ruta absoluta del directorio de datos
-DATA_DIR = None
-PROJECT_ROOT = None # Store project root path as well
+# --- Variables Globales Clave ---
+# Estas variables guardarán la ruta absoluta de nuestra carpeta 'data' y la ruta raíz del proyecto.
+# Las definimos como globales para que cualquier función en cualquier parte de la aplicación pueda acceder a ellas una vez que se inicializan.
+# Inicialmente son None porque todavía no sabemos dónde está la carpeta 'data' hasta que la aplicación arranca y llama a 'initialize_paths'.
+DATA_DIR = None # Aquí guardaremos la ruta COMPLETA y ABSOLUTA de nuestra carpeta 'data'.
+PROJECT_ROOT = None # Aquí guardaremos la ruta COMPLETA y ABSOLUTA de la carpeta raíz del proyecto (donde está app.py).
 
+# --- Función de Inicialización CRUCIAL ---
+# Esta función es VITAL. Debe llamarse UNA VEZ al inicio de la aplicación (generalmente desde app.py).
+# Su trabajo es descubrir dónde está la carpeta 'data' y guardar su ruta de forma segura en la variable global DATA_DIR.
 def initialize_paths(project_root_path):
     """
-    Inicializa las rutas PROJECT_ROOT y DATA_DIR basadas en la ruta raíz del proyecto.
-    DATA_DIR se almacenará como ruta absoluta.
-    Debe ser llamada una vez al inicio de la aplicación.
+    Esta función inicializa las variables globales PROJECT_ROOT y DATA_DIR.
+    Recibe la ruta de la carpeta donde está app.py (la raíz del proyecto).
+    DATA_DIR se calcula y se almacena como una ruta absoluta, ¡siempre segura!
     """
+    # Para poder modificar las variables globales DATA_DIR y PROJECT_ROOT dentro de esta función, debemos usar la palabra clave 'global'.
     global DATA_DIR, PROJECT_ROOT
+
+    # Obtenemos la ruta absoluta de la raíz del proyecto que nos pasaron. Esto evita problemas si el script se ejecuta desde un lugar diferente.
     PROJECT_ROOT = os.path.abspath(project_root_path)
-    # Ensure DATA_DIR is stored as its absolute path immediately after joining
+
+    # Construimos la ruta completa a la carpeta 'data' uniendo la ruta raíz del proyecto con 'data'.
+    # ¡Y la convertimos inmediatamente a su ruta absoluta! Esto garantiza que DATA_DIR SIEMPRE sea una ruta absoluta y limpia.
     DATA_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, 'data'))
 
-    # Asegurar que el directorio data exista
+    # Ahora, verificamos si la carpeta 'data' realmente existe en el sistema de archivos.
     if not os.path.exists(DATA_DIR):
+        # Si no existe, ¡la creamos! 'os.makedirs' es genial porque crea también los directorios padres si fuera necesario.
         os.makedirs(DATA_DIR)
-        print(f"utils.py: Directorio DATA_DIR creado en: {DATA_DIR}") # Log para verificar
+        print(f"utils.py: Directorio DATA_DIR creado en: {DATA_DIR}") # Log para confirmar que la creamos.
     else:
-        print(f"utils.py: Directorio DATA_DIR ya existe en: {DATA_DIR}") # Log para verificar
+        print(f"utils.py: Directorio DATA_DIR ya existe en: {DATA_DIR}") # Log para confirmar que ya estaba ahí.
 
-# Dedicated function to get the absolute DATA_DIR path reliably
+# --- Función para obtener la ruta de DATA_DIR de forma segura ---
+# Esta función es la forma recomendada de obtener la ruta de DATA_DIR en otras partes del código.
+# Asegura que DATA_DIR ya haya sido inicializado.
 def get_data_dir_abs():
     """
-    Retorna la ruta absoluta del directorio DATA_DIR.
-    Asegura que DATA_DIR está inicializado.
-    Si no está inicializado, levanta un error de tiempo de ejecución.
+    Devuelve la ruta absoluta y segura de nuestra carpeta 'data'.
+    Lanza un error si 'initialize_paths' no se llamó antes.
     """
+    # Verificamos si la variable global DATA_DIR todavía es None. Si lo es, significa que initialize_paths no se ejecutó.
     if DATA_DIR is None:
-        # Raising a RuntimeError is better here to signal a critical setup issue
-        raise RuntimeError("DATA_DIR has not been initialized. Call initialize_paths() at application startup.")
-    return DATA_DIR # DATA_DIR is already stored as absolute
+        # Lanzamos un RuntimeError. Este tipo de error es bueno para indicar problemas graves de configuración o de que algo no se llamó en el orden correcto.
+        raise RuntimeError("DATA_DIR no ha sido inicializado. Llama a initialize_paths() al inicio de la aplicación (ej. en app.py).")
+    # Si DATA_DIR no es None, significa que ya está inicializado y contiene la ruta absoluta segura.
+    return DATA_DIR # Devolvemos la ruta absoluta de DATA_DIR.
 
-# Helper function to get full path with security checks
+# --- Función CLAVE de Seguridad: Obtener y Validar Ruta Completa ---
+# Esta es una de las funciones más importantes para la seguridad.
+# Convierte una ruta que viene del usuario (del frontend) a una ruta completa y ABSOLUTA en el sistema de archivos,
+# ¡PERO solo si esa ruta está DENTRO de nuestra carpeta 'data'!
 def get_full_path(user_path):
     """
-    Construye la ruta completa dentro de DATA_DIR y la valida para prevenir
-    vulnerabilidades de Directory Traversal.
-    Retorna la ruta absoluta si es válida, de lo contrario retorna None.
+    Recibe una ruta 'user_path' (ej: 'documentos/mi_archivo.txt' o '../otro_lugar').
+    Construye la ruta completa combinándola con DATA_DIR.
+    Realiza comprobaciones de seguridad para PREVENIR ataques de "Directory Traversal" (intentos de salirse de DATA_DIR).
+    Devuelve la ruta absoluta final si es segura y válida, de lo contrario, devuelve None.
     """
-    # Use the dedicated function to get the absolute DATA_DIR
+    # Primero, obtenemos la ruta absoluta y segura de DATA_DIR usando nuestra función dedicada.
     try:
         data_dir_abs = get_data_dir_abs()
     except RuntimeError as e:
-        print(f"utils.py: Error in get_full_path: {e}")
-        return None # Return None if DATA_DIR is not initialized
+        # Si DATA_DIR no estaba inicializado al llamar a esta función, logueamos el error y devolvemos None.
+        print(f"utils.py: Error en get_full_path: {e}")
+        return None # Si DATA_DIR no está listo, no podemos validar nada.
 
-    # --- Logging para diagnóstico detallado ---
+    # --- Logueo para ver el proceso de validación de rutas ---
     print(f"\n--- get_full_path ---")
-    print(f"Input user_path (from frontend): '{user_path}'")
-    # Use the already absolute DATA_DIR for logging
-    print(f"Configured DATA_DIR (absolute): '{data_dir_abs}'")
-
+    print(f"Ruta de usuario de entrada (del frontend): '{user_path}'")
+    # Mostramos la ruta absoluta de DATA_DIR que usaremos como base.
+    print(f"DATA_DIR configurado (absoluto): '{data_dir_abs}'")
 
     try:
-        # Si no se proporciona ninguna ruta (ej. para el directorio raíz), retornar la ruta absoluta de DATA_DIR.
+        # Caso especial: Si la ruta de usuario está vacía, significa que el frontend quiere la raíz de 'data'.
+        # En este caso, devolvemos directamente la ruta absoluta de DATA_DIR.
         if not user_path:
-            print(f"Result: user_path vacío, retornando DATA_DIR absoluto = '{data_dir_abs}'")
+            print(f"Resultado: user_path vacío, devolviendo DATA_DIR absoluto = '{data_dir_abs}'")
             print(f"--- Fin get_full_path ---\n")
-            return data_dir_abs # Return the absolute DATA_DIR
+            return data_dir_abs # ¡La raíz es válida!
 
-        # --- CORRECCIÓN AQUÍ: Eliminar el prefijo 'data/' si existe ---
-        # The frontend sends paths that already include 'data/', but we must join them to the absolute DATA_DIR path.
-        # If user_path starts with 'data/', remove it to avoid duplication when joining with the absolute DATA_DIR.
+        # --- ¡CORRECCIÓN/AJUSTE aquí! ---
+        # El frontend a menudo envía rutas que *ya* empiezan conceptualmente con 'data/' (ej: 'data/documentos/archivo').
+        # Como nosotros vamos a unir la ruta recibida con la RUTA ABSOLUTA de DATA_DIR (ej: '/home/usuario/mi_app/data'),
+        # si la ruta recibida empieza con 'data/', tendríamos algo como '/home/usuario/mi_app/data/data/documentos/archivo', lo cual está mal.
+        # Esta parte del código intenta quitar ese prefijo 'data/' si existe para que la unión con el DATA_DIR absoluto sea correcta.
         processed_user_path = user_path
-        # More robust check: ensure it's the DATA_DIR prefix before removing
-        # This assumes the frontend path starts with "data/" relative to the project root conceptually
-        # A safer way might be to check if user_path, when made absolute relative to PROJECT_ROOT,
-        # starts with DATA_DIR, but let's stick to the current logic's intent for now.
-        # The existing check `processed_user_path.startswith('data/')` is probably sufficient given the frontend code.
+        # Comprobamos si la ruta recibida empieza con 'data/' (usando una barra '/' sin importar el OS, ya que viene del frontend).
+        # NOTA: La robustez total de esta verificación depende de cómo el frontend construya las rutas.
         if processed_user_path.startswith('data/'):
-            processed_user_path = processed_user_path[len('data/'):]
-            print(f"Removed 'data/' prefix. Processed user_path: '{processed_user_path}'")
-        elif processed_user_path == 'data': # Handle the case where user_path is just 'data'
-             processed_user_path = ''
-             print(f"Handled 'data' path. Processed user_path: '{processed_user_path}'")
+            processed_user_path = processed_user_path[len('data/'):] # Quitamos el prefijo 'data/'.
+            print(f"Prefijo 'data/' eliminado. Ruta de usuario procesada: '{processed_user_path}'")
+        elif processed_user_path == 'data': # También manejamos el caso exacto en que la ruta sea solo 'data'.
+             processed_user_path = '' # Si es solo 'data', la ruta relativa procesada es la cadena vacía (la raíz).
+             print(f"Ruta 'data' manejada. Ruta de usuario procesada: '{processed_user_path}'")
 
 
-        # Convertir las barras diagonales del frontend a separadores del sistema operativo
+        # Las rutas que vienen del frontend usan barras diagonales '/'. Los sistemas operativos pueden usar diferentes separadores ('\' en Windows).
+        # Convertimos las barras diagonales a las barras correctas del sistema operativo.
         os_specific_path = processed_user_path.replace('/', os.sep)
-        print(f"Converted to OS specific separators: '{os_specific_path}'")
+        print(f"Convertido a separadores específicos del OS: '{os_specific_path}'")
 
-        # Normalizar la ruta específica del OS
-        # Usamos os.path.normpath para manejar '..' y '.' y múltiples separadores
-        # Luego strip(os.sep) para quitar cualquier separador al inicio o final
+        # Normalizamos la ruta específica del OS.
+        # 'os.path.normpath()' limpia la ruta: maneja '.' (directorio actual), '..' (directorio padre), y múltiples barras (ej: 'a//b' -> 'a/b').
+        # '.strip(os.sep)' quita cualquier separador al principio o final (evitando que alguien ponga '/../').
         normalized_os_path = os.path.normpath(os_specific_path).strip(os.sep)
-        print(f"Normalized OS specific path: '{normalized_os_path}'")
+        print(f"Ruta específica del OS normalizada: '{normalized_os_path}'")
 
-        # Unir el DATA_DIR absoluto con la ruta normalizada específica del OS
-        # Use the absolute DATA_DIR directly
+        # Ahora, unimos la ruta ABSOLUTA de DATA_DIR con la parte de la ruta de usuario ya limpia y normalizada.
+        # Esto nos da la ruta completa potencial dentro de nuestra carpeta 'data'.
         full_item_path_candidate = os.path.join(data_dir_abs, normalized_os_path)
-        print(f"Candidate full path (DATA_DIR + normalized): '{full_item_path_candidate}'")
+        print(f"Ruta completa candidata (DATA_DIR + normalizada): '{full_item_path_candidate}'")
 
-        # Obtener la ruta absoluta final y resuelta para la verificación de seguridad y existencia
-        # Resolve any symlinks or complex paths relative to the filesystem root
-        requested_abs = os.path.abspath(full_item_path_candidate)
-        print(f"Requested absolute path: '{requested_abs}'")
+        # ¡Última y MÁS IMPORTANTE verificación de seguridad!
+        # Convertimos la ruta candidata a su ruta absoluta final y resuelta. Esto resuelve cualquier '..' remanente o enlaces simbólicos.
+        # Luego, comparamos esta ruta ABSOLUTA final con la ruta ABSOLUTA de DATA_DIR.
+        # Si la ruta solicitada NO EMPIEZA con la ruta de DATA_DIR, significa que el usuario intentó salirse de nuestra carpeta 'data'.
+        # Convertimos a minúsculas (.lower()) para que la comparación funcione igual en sistemas que no distinguen mayúsculas/minúsculas.
+        requested_abs = os.path.abspath(full_item_path_candidate) # Obtenemos la ruta absoluta y resuelta final.
+        print(f"Ruta absoluta solicitada (final): '{requested_abs}'")
+        print(f"DATA_DIR absoluto para comparación: '{data_dir_abs}'")
 
-        # Obtener la ruta absoluta de DATA_DIR para comparación de seguridad (DATA_DIR is already absolute)
-        # data_dir_abs is already obtained above
-        print(f"DATA_DIR absolute for comparison: '{data_dir_abs}'")
 
-
-        # Validación de seguridad: Asegurarse de que la ruta absoluta solicitada esté dentro de DATA_DIR.
-        # Convertir ambas rutas a minúsculas para comparación insensible a mayúsculas (más seguro en algunos OS)
-        # Utilizamos startswith después de asegurar que requested_abs está normalizada y absoluta
         if not requested_abs.lower().startswith(data_dir_abs.lower()):
-             print(f"SECURITY ALERT: Path '{requested_abs}' does NOT start with DATA_DIR '{data_dir_abs}'. Returning None.")
+             # ¡Alerta de seguridad! La ruta intentó salirse de DATA_DIR.
+             print(f"ALERTA DE SEGURIDAD: La ruta '{requested_abs}' NO empieza con DATA_DIR '{data_dir_abs}'. Devolviendo None.")
              print(f"--- Fin get_full_path ---\n")
-             return None # La ruta está fuera de DATA_DIR, potencial intento de traversal.
+             return None # Devolvemos None para indicar que la ruta no es segura.
 
-        # Si la ruta pasa la validación de seguridad, es la ruta completa y válida que buscamos.
-        print(f"Result: Valid path within DATA_DIR. Returning '{requested_abs}'")
+        # Si pasamos esta verificación, la ruta es segura y válida dentro de DATA_DIR.
+        print(f"Resultado: Ruta válida dentro de DATA_DIR. Devolviendo '{requested_abs}'")
         print(f"--- Fin get_full_path ---\n")
-        return requested_abs
+        return requested_abs # Devolvemos la ruta absoluta y segura.
 
     except Exception as e:
-        # Capturar cualquier error inesperado during path processing (excluding the RuntimeError from get_data_dir_abs)
-        print(f"Exception in get_full_path for '{user_path}': {e}. Returning None.")
+        # Capturamos cualquier otro error inesperado durante el procesamiento de la ruta (aparte del error de inicialización de DATA_DIR).
+        print(f"Excepción inesperada en get_full_path para '{user_path}': {e}. Devolviendo None.")
         print(f"--- Fin get_full_path ---\n")
-        return None
+        return None # Si hay un error, consideramos la ruta no válida.
 
+# --- Función para mostrar la ruta de forma legible en el frontend ---
+# Esta función toma una ruta COMPLETA y ABSOLUTA y la convierte en un formato más amigable para el usuario,
+# relativo a 'data/' (ej: 'data/documentos/').
 def get_current_path_display(path):
     """
-    Retorna una visualización legible de la ruta actual relativa a DATA_DIR.
+    Recibe una ruta 'path' (que debería ser una ruta absoluta válida dentro de DATA_DIR).
+    Devuelve una cadena de texto amigable para mostrar en el frontend, como 'data/subcarpeta/'.
     """
-    # Use the dedicated function to get the absolute DATA_DIR
+    # Obtenemos la ruta absoluta de DATA_DIR de forma segura.
     try:
         data_dir_abs = get_data_dir_abs()
     except RuntimeError:
+         # Si DATA_DIR no está inicializado, no podemos formatear la ruta.
          print("utils.py: Error: DATA_DIR no inicializado al obtener la ruta para visualización.")
-         return 'Error de Ruta' # Return error message if DATA_DIR is not initialized
+         return 'Error de Ruta' # Devolvemos un mensaje de error.
 
 
-    # If the path corresponds to the absolute DATA_DIR path, show 'data/'
-    # Compare against the already absolute DATA_DIR
+    # Si la ruta que nos pasaron es exactamente la ruta absoluta de DATA_DIR...
+    # Es decir, si estamos en el directorio raíz de 'data'.
     if os.path.abspath(path) == data_dir_abs:
-        return 'data/'
+        return 'data/' # Mostramos simplemente 'data/' en el frontend.
 
-    # Obtener la ruta relativa a DATA_DIR
+    # Si no estamos en la raíz, calculamos la ruta relativa a DATA_DIR.
     try:
-        # Use os.path.relpath with the absolute DATA_DIR
-        relative_path = os.path.relpath(os.path.abspath(path), data_dir_abs) # Ensure path is also absolute for relpath
-        # Reemplazar separadores específicos del OS con barras diagonales para visualización en URL
+        # 'os.path.relpath(path, start)' calcula la ruta para ir desde 'start' hasta 'path'.
+        # Le pasamos la ruta actual (asegurándonos de que sea absoluta) y la ruta absoluta de DATA_DIR como punto de inicio.
+        relative_path = os.path.relpath(os.path.abspath(path), data_dir_abs)
+        # Las rutas relativas que devuelve os.path.relpath usan los separadores del OS.
+        # Los reemplazamos por barras diagonales '/' para que se vean bien en la URL y en el frontend.
         display_path = relative_path.replace(os.sep, '/')
-        # Añadir barra diagonal al final si es un directorio (ya manejado arriba para la raíz)
-        # Solo añadir si no es la cadena vacía (que representa el directorio actual if it's DATA_DIR)
+
+        # Añadimos una barra diagonal al final si la ruta original era un directorio (y no la raíz o '.').
+        # Esto ayuda a diferenciar visualmente carpetas de archivos en la visualización de la ruta.
         if os.path.isdir(os.path.abspath(path)) and display_path and display_path != '.' and not display_path.endswith('/'):
              display_path += '/'
-        # If relative_path is '.', display_path is '', we want 'data/'
+
+        # Si la ruta relativa es '.' (que a veces ocurre si path ya era DATA_DIR), la mostramos como vacía para la unión.
         if display_path == '.':
              display_path = ''
+        # Finalmente, anteponemos 'data/' a la ruta relativa formateada para la visualización final.
         return 'data/' + display_path
     except ValueError:
-        # Manejar casos donde la ruta no está dentro de DATA_DIR
-        return 'Ruta Inválida'
+        # Este error puede ocurrir si la ruta 'path' no está contenida dentro de 'data_dir_abs'.
+        # Si get_full_path se usó correctamente, esta excepción no debería ocurrir, pero la manejamos por robustez.
+        return 'Ruta Inválida' # Si la ruta no es válida en relación a DATA_DIR, mostramos un error.
     except Exception as e:
-         # Catch any other unexpected errors during display path generation
-         print(f"utils.py: Unexpected error in get_current_path_display for '{path}': {e}")
-         return 'Error de Ruta'
+         # Capturamos cualquier otro error inesperado al formatear la ruta para mostrar.
+         print(f"utils.py: Error inesperado en get_current_path_display para '{path}': {e}")
+         return 'Error de Ruta' # Mensaje genérico de error de ruta.

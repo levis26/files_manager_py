@@ -1,126 +1,154 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es"> {# Le indicamos al navegador y a los motores de búsqueda que el idioma de la página es español #}
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"> {# Definimos la codificación de caracteres, vital para que se vean bien las tildes, eñes, etc. #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {# Configura la página para ser responsiva, ajustándose al ancho del dispositivo #}
+    {# Metadatos para SEO (aunque para una app local no es tan crítico, es buena práctica) #}
     <meta name="description" content="FileFlow - Gestor de archivos profesional con interfaz moderna y eficiente">
     <meta name="keywords" content="gestor archivos, file manager, administración archivos, explorador archivos">
     <meta name="author" content="FileFlow Team">
-    <title>FileFlow - Gestor de Archivos Inteligente</title>
-    {# Links to Bootstrap, Icons, Font, and custom CSS are in base.html #}
-    {# We keep them here as well for direct access, though base.html includes them #}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>FileFlow - Gestor de Archivos Inteligente</title> {# El título que aparece en la pestaña del navegador #}
+
+    {# En un proyecto más grande usando Flask con jinja2, estos links podrían estar en un archivo base.html del que este index.html herede.
+       Aquí los mantenemos directamente para que el archivo sea autocontenido, aunque la nota original menciona base.html. #}
+    {# Links a Bootstrap, Iconos, Fuente de Google Fonts, y nuestro CSS personalizado #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> {# El CSS de Bootstrap para estilos predefinidos y responsive #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet"> {# La librería de iconos de Bootstrap #}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> {# Importamos la fuente "Inter" de Google Fonts #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> {# Nuestro archivo CSS personalizado. url_for es una función de Flask/Jinja para generar la URL correcta al archivo estático. #}
 </head>
 <body>
 
-    <main class="container my-4">
-        <div class="card shadow-lg rounded-4 border-0 bg-white/90">
+    {# La etiqueta <main> se usa para el contenido principal de la página #}
+    <main class="container my-4"> {# Un contenedor de Bootstrap que centra el contenido y le da un margen vertical (margin-y) de 4 #}
+        {# La tarjeta principal que envuelve toda nuestra interfaz #}
+        <div class="card shadow-lg rounded-4 border-0 bg-white/90"> {# Clases de Bootstrap para una tarjeta con sombra grande, esquinas redondeadas, sin borde, y fondo blanco semi-transparente (con /90 asumiendo soporte CSS moderno o alguna utilidad) #}
+            {# Un div extra con clase "lineal" (clase custom, no de Bootstrap) - su propósito exacto no está claro solo en este HTML, podría usarse en CSS custom #}
             <div class="lineal">
-                <div class="card-header bg-light bg-gradient p-4 d-flex flex-row align-items-center justify-content-between w-100">
-                    <!-- Left section: Title and Search -->
-                    <div class="d-flex align-items-center flex-grow-1">
-                        <!-- Title -->
-                        <div class="d-flex align-items-center me-4">
-                            <i class="bi bi-folder2-open me-2 fs-3 text-primary"></i>
-                            <div>
-                                <h4 class="mb-0 fw-bold text-primary">File Manager</h4>
+                {# La cabecera de la tarjeta. Contiene el título de la app y el área de búsqueda/recarga. #}
+                <div class="card-header bg-light bg-gradient p-4 d-flex flex-row align-items-center justify-content-between w-100"> {# Clases de Bootstrap para: fondo gris claro con gradiente, padding en todas direcciones, contenedor flexible (flexbox), dirección por defecto en fila (horizontal), centrado verticalmente, espacio distribuido entre elementos, y ancho completo #}
+                    {# Un contenedor flexible interno para agrupar el título y el buscador #}
+                    <div class="d-flex align-items-center flex-grow-1"> {# Contenedor flexible, centrado verticalmente, que crece para ocupar espacio #}
+                        <div class="d-flex align-items-center me-4"> {# Contenedor flexible para icono y texto del título, con margen a la derecha #}
+                            <i class="bi bi-folder2-open me-2 fs-3 text-primary"></i> {# Icono de carpeta, con margen y tamaño de fuente grande, color primario #}
+                            <div> {# Contenedor para el texto del título #}
+                                <h4 class="mb-0 fw-bold text-primary">File Manager</h4> {# Título h4, sin margen inferior, texto negrita, color primario #}
                             </div>
                         </div>
-                        <!-- Search -->
-                        <div class="d-flex align-items-center flex-grow-1">
-                            <div class="input-group flex-grow-1">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-search text-muted"></i>
+                        <div class="d-flex align-items-center flex-grow-1"> {# Contenedor flexible para el buscador, centrado verticalmente, que crece #}
+                            {# El grupo de input para el buscador (icono + campo de texto) #}
+                            <div class="input-group flex-grow-1"> {# Grupo de input de Bootstrap, que crece para ocupar espacio #}
+                                <span class="input-group-text bg-white border-end-0"> {# El "prefijo" del input group, con fondo blanco y sin borde derecho #}
+                                    <i class="bi bi-search text-muted"></i> {# Icono de búsqueda, color atenuado #}
                                 </span>
-                                <input type="text" class="form-control border-start-0 rounded-end" id="searchInput"
-                                       placeholder="Buscar archivos..."
-                                       oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(searchFiles, 300)">
+                                <input type="text" class="form-control border-start-0 rounded-end" id="searchInput" {# El campo de input de texto, sin borde izquierdo, esquinas derechas redondeadas, con ID #}
+                                       placeholder="Buscar archivos..." {# Texto de ejemplo dentro del campo #}
+                                       {# ¡Esto es JavaScript en línea! Cuando el usuario escribe algo (evento oninput)... #}
+                                       oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(searchFiles, 300)"> {# ...limpiamos un temporizador previo y establecemos uno nuevo para llamar a la función searchFiles después de 300ms de inactividad (evita buscar en cada tecla) #}
                             </div>
                         </div>
                     </div>
+                     {# Nota: El botón de Recargar, según discusiones previas, se movió fuera de este div y se colocó directamente en el card-body, o se reestructuró la cabecera para pantallas pequeñas.
+                       El HTML proporcionado parece una versión intermedia donde el botón de recargar SÍ está en el sidebar, no aquí. Pero lo comentamos por si esta versión fuera la final. #}
+                    {# El botón de Recargar ya no está aquí, se movió al sidebar según discusiones previas #}
                 </div>
             </div>
 
 
 
 
-            <div class="card-body p-0">
-                <div class="row g-0">
-                    <div class="col-md-3 col-lg-2 border-end bg-white/95">
-                        <div class="p-3 sidebar h-100"> {# Added sidebar class and h-100 for full height #}
-                            <h5 class="d-flex align-items-center mb-3 text-secondary">
-                                <i class="bi bi-gear me-2 fs-5"></i> Acciones
+            {# El cuerpo principal de la tarjeta. Aquí se divide en sidebar, navegador y previsualización. #}
+            <div class="card-body p-0"> {# Cuerpo de la tarjeta, sin padding por defecto #}
+                {# Una fila de Bootstrap (con gutter 0) para dividir el espacio horizontalmente #}
+                <div class="row g-0 h-100"> {# g-0 quita el padding entre columnas, h-100 hace que la fila ocupe el alto completo del card-body #}
+                    {# Columna para el Sidebar #}
+                    <div class="col-md-3 col-lg-2 border-end bg-white/95"> {# En pantallas medianas (md) ocupa 3 cols, en grandes (lg) 2 cols. Tiene borde derecho y fondo blanco semi-transparente. #}
+                        <div class="p-3 sidebar h-100"> {# Padding interno, clase custom "sidebar", y ocupa el 100% del alto de la columna padre #}
+                            {# Título de la sección de acciones del sidebar #}
+                            <h5 class="d-flex align-items-center mb-3 text-secondary"> {# Título h5, con flexbox para alinear icono, margen inferior, color secundario #}
+                                <i class="bi bi-gear me-2 fs-5"></i> Acciones {# Icono de engranaje, margen derecho, tamaño de fuente, texto "Acciones" #}
                             </h5>
-                            <div class="d-flex align-items-center justify-content-end mt-2">
-                                <button class="btn btn-outline-primary me-3" title="Recargar" id="updateButton">
-                                    <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">Recargar</span>
+                            {# Contenedor para el botón de Recargar dentro del sidebar (esto parece ser donde se colocó finalmente) #}
+                             <div class="d-flex align-items-center justify-content-end mt-2"> {# Contenedor flexible, centrado verticalmente, alineado a la derecha, con margen superior #}
+                                <button class="btn btn-outline-primary me-3" title="Recargar" id="updateButton"> {# Botón de Bootstrap, con color primario delineado, margen derecho, título (tooltip), e ID #}
+                                    <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">Recargar</span> {# Icono de recargar. El span con "Recargar" solo se muestra en pantallas medianas y mayores. #}
                                 </button>
                             </div>
-                            <div class="list-group list-group-flush">
-                                <button type="button" class="list-group-item list-group-item-action" id="sidebarCreateDirBtn">
-                                    <i class="bi bi-folder-plus me-2"></i> Crear Carpeta
+                            {# Grupo de lista de Bootstrap para los botones de acción principales del sidebar #}
+                            <div class="list-group list-group-flush"> {# Grupo de lista sin bordes (flush) #}
+                                {# Botón para Crear Carpeta #}
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarCreateDirBtn"> {# Botón, con clases de lista de acción (clickeable) y ID #}
+                                    <i class="bi bi-folder-plus me-2"></i> Crear Carpeta {# Icono y texto #}
                                 </button>
-                                <button type="button" class="list-group-item list-group-item-action" id="sidebarCreateFileBtn">
-                                    <i class="bi bi-file-earmark-plus me-2"></i> Crear Archivo
+                                {# Botón para Crear Archivo #}
+                                <button type="button" class="list-group-item list-group-item-action" id="sidebarCreateFileBtn"> {# Botón, con clases de lista de acción y ID #}
+                                    <i class="bi bi-file-earmark-plus me-2"></i> Crear Archivo {# Icono y texto #}
                                 </button>
-                                </div>
+                                {# Nota: Los botones de Eliminar, Añadir Contenido y Renombrar, aunque se manejan desde el sidebar según discusiones JS, no tienen botones explícitos aquí. Probablemente la interfaz espera que se habiliten y muestren dinámicamente O se usan los que aparecen en la lista de archivos. El CSS sugiere estilos para botones en la lista de items. Si los botones de sidebar fueran fijos, irían aquí con IDs como deleteButton, appendButton, renameButton. La lógica JS asume que esos IDs existen. #}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-9 col-lg-10 main-content bg-white/95"> {# Added main-content class #}
-                        <div class="row g-0 h-100">
-                            <div class="col-md-8 browser-pane border-end"> {# Added browser-pane class #}
-                                <div class="p-3 h-100 d-flex flex-column">
-                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="h5 mb-0 d-flex align-items-center">
-                                            <i class="bi bi-folder2-open me-2 fs-5 text-secondary"></i>
-                                            <span class="fs-5 text-muted">Estás en: <span id="currentPath" class="fw-bold text-primary">data/</span></span> {# Slightly rephrased text #}
+                    {# Columna para el Contenido Principal (Navegador + Previsualización) #}
+                    <div class="col-md-9 col-lg-10 main-content bg-white/95"> {# En md ocupa 9 cols, en lg 10 cols. Clase custom "main-content" y fondo. #}
+                        {# Otra fila anidada para dividir este espacio en Navegador y Previsualización #}
+                        <div class="row g-0 h-100"> {# Fila sin gutters, altura completa #}
+                            {# Columna para el Navegador de Archivos #}
+                            <div class="col-md-8 browser-pane border-end"> {# En md ocupa 8 cols (de las 9/10 disponibles en main-content). Clase custom "browser-pane", borde derecho. #}
+                                <div class="p-3 h-100 d-flex flex-column"> {# Padding, altura completa, flexbox en columna para apilar header y lista #}
+                                     {# Cabecera del navegador (donde se muestra la ruta actual) #}
+                                     <div class="d-flex justify-content-between align-items-center mb-3"> {# Flexbox para espacio entre elementos, centrado verticalmente, margen inferior #}
+                                        <div class="h5 mb-0 d-flex align-items-center"> {# Título h5, sin margen inferior, flexbox para alinear icono y texto de ruta #}
+                                            <i class="bi bi-folder2-open me-2 fs-5 text-secondary"></i> {# Icono de carpeta, margen, tamaño, color secundario #}
+                                            <span class="fs-5 text-muted">Estás en: <span id="currentPath" class="fw-bold text-primary">data/</span></span> {# Texto "Estás en:", color atenuado, y un span con ID para la ruta actual (texto negrita, color primario) que se actualiza con JS #}
                                         </div>
                                     </div>
-                                    <div id="browser-content" class="list-group flex-grow-1 overflow-auto custom-scroll">
-                                        {# Content will be loaded by JavaScript #}
-                                        {# Placeholder for loading state #}
-                                        <div class="text-muted text-center py-5 loading-state">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Cargando...</span>
+                                    {# Área donde se carga la lista de archivos y carpetas #}
+                                    <div id="browser-content" class="list-group flex-grow-1 overflow-auto custom-scroll"> {# ID para JS, clases de lista, crece para llenar espacio, scroll automático si el contenido excede, clase custom para scrollbar #}
+                                        {# El contenido de la lista se carga dinámicamente con JavaScript (main.js) #}
+                                        {# Placeholder para cuando se está cargando #}
+                                        <div class="text-muted text-center py-5 loading-state"> {# Texto atenuado, centrado, padding vertical, clase custom "loading-state" #}
+                                            <div class="spinner-border text-primary" role="status"> {# Spinner de Bootstrap #}
+                                                <span class="visually-hidden">Cargando...</span> {# Texto para lectores de pantalla #}
                                             </div>
-                                            <p class="mt-2">Cargando...</p>
+                                            <p class="mt-2">Cargando...</p> {# Mensaje de carga #}
                                         </div>
-                                         {# Placeholder for empty directory state #}
-                                        <div class="text-muted text-center py-5 empty-state d-none"> {# Initially hidden #}
-                                             <i class="bi bi-folder2-open fs-1 mb-3"></i>
-                                            <p>Este directorio está vacío.</p>
+                                         {# Placeholder para cuando el directorio está vacío #}
+                                        <div class="text-muted text-center py-5 empty-state d-none"> {# Similar al de carga, inicialmente oculto (d-none) #}
+                                             <i class="bi bi-folder2-open fs-1 mb-3"></i> {# Icono grande de carpeta abierta #}
+                                            <p>Este directorio está vacío.</p> {# Mensaje #}
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-4 preview-pane bg-white/95"> {# Added preview-pane class #}
-                                <div class="p-3 h-100 d-flex flex-column">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="d-flex align-items-center mb-0 text-secondary">
-                                            <i class="bi bi-eye me-2 fs-5"></i> Previsualización
+                            {# Columna para el Panel de Previsualización #}
+                            <div class="col-md-4 preview-pane bg-white/95"> {# En md ocupa 4 cols (de las 9/10 disponibles). Clase custom "preview-pane", fondo. #}
+                                <div class="p-3 h-100 d-flex flex-column"> {# Padding, altura completa, flexbox en columna para apilar header y área de contenido #}
+                                    {# Cabecera del panel de previsualización #}
+                                    <div class="d-flex justify-content-between align-items-center mb-3"> {# Flexbox, espacio entre elementos, centrado vertical, margen inferior #}
+                                        <h5 class="d-flex align-items-center mb-0 text-secondary"> {# Título h5, sin margen inferior, flexbox para icono/texto, color secundario #}
+                                            <i class="bi bi-eye me-2 fs-5"></i> Previsualización {# Icono de ojo, margen, tamaño, texto #}
                                         </h5>
-                                        <button class="btn btn-sm btn-outline-secondary" id="maximizePreviewBtn" title="Maximizar Previsualización" style="visibility: hidden;">
-                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        {# Botón para maximizar la previsualización #}
+                                        <button class="btn btn-sm btn-outline-secondary" id="maximizePreviewBtn" title="Maximizar Previsualización" style="visibility: hidden;"> {# Botón pequeño, delineado secundario, con ID, título. Inicialmente oculto (JS lo hará visible cuando haya contenido). #}
+                                            <i class="bi bi-arrows-fullscreen"></i> {# Icono de pantalla completa #}
                                         </button>
                                     </div>
-                                    <div id="file-preview" class="flex-grow-1 overflow-auto bg-light p-3 rounded-3 text-muted text-center d-flex flex-column align-items-center justify-content-center custom-scroll"
-                                         data-file-path="" data-file-content="">
-                                        {# Placeholder for initial state #}
-                                        <div class="text-muted text-center py-5 initial-preview-state">
-                                             <i class="bi bi-file-earmark-text fs-1 mb-3"></i>
-                                            <p>Selecciona un archivo para ver su contenido.</p>
+                                    {# Área donde se carga el contenido del archivo previsualizado #}
+                                    <div id="file-preview" class="flex-grow-1 overflow-auto bg-light p-3 rounded-3 text-muted text-center d-flex flex-column align-items-center justify-content-center custom-scroll" {# ID para JS, crece para llenar espacio, scroll automático, fondo gris claro, padding, esquinas redondeadas, texto atenuado, centrado, flexbox para centrar placeholders, custom scrollbar #}
+                                         data-file-path="" data-file-content=""> {# Atributos data- para guardar info del archivo (quizás un poco redundante si JS lo guarda globalmente) #}
+                                        {# Placeholder para el estado inicial (cuando no hay archivo seleccionado) #}
+                                        <div class="text-muted text-center py-5 initial-preview-state"> {# Similar a otros placeholders #}
+                                             <i class="bi bi-file-earmark-text fs-1 mb-3"></i> {# Icono de archivo #}
+                                            <p>Selecciona un archivo para ver su contenido.</p> {# Mensaje de instrucción #}
                                         </div>
-                                         {# Placeholder for preview error state #}
-                                         <div class="text-muted text-center py-5 preview-error-state d-none"> {# Initially hidden #}
-                                            <i class="bi bi-x-circle-fill text-danger fs-1 mb-3"></i>
-                                            <p>Error al cargar la previsualización.</p>
+                                         {# Placeholder para cuando hay un error al cargar la previsualización #}
+                                         <div class="text-muted text-center py-5 preview-error-state d-none"> {# Inicialmente oculto #}
+                                            <i class="bi bi-x-circle-fill text-danger fs-1 mb-3"></i> {# Icono de error, color peligro #}
+                                            <p>Error al cargar la previsualización.</p> {# Mensaje de error #}
                                         </div>
-                                        {# File content will be loaded here by JavaScript #}
+                                        {# El contenido del archivo se carga aquí dinámicamente con JavaScript #}
                                     </div>
                                 </div>
                             </div>
@@ -131,173 +159,182 @@
         </div>
     </main>
 
-    {# Modals - Keep their structure largely the same, styling will enhance them #}
-    <div class="modal fade" id="createDirModal" tabindex="-1" aria-labelledby="createDirModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createDirModalLabel"><i class="bi bi-folder-plus me-2"></i>Crear Carpeta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    {# --- Modales (Ventanas Emergentes) --- #}
+    {# Definimos la estructura de todos los modales que se usarán en la aplicación #}
+    {# Modal para Crear Carpeta #}
+    <div class="modal fade" id="createDirModal" tabindex="-1" aria-labelledby="createDirModalLabel" aria-hidden="true"> {# Div principal del modal, con ID, tabindex para accesibilidad, y atributos para ocultarlo #}
+        <div class="modal-dialog"> {# Contenedor para el contenido del modal #}
+            <div class="modal-content"> {# El "cuerpo" visual del modal #}
+                <div class="modal-header"> {# Cabecera del modal #}
+                    <h5 class="modal-title" id="createDirModalLabel"><i class="bi bi-folder-plus me-2"></i>Crear Carpeta</h5> {# Título del modal con icono #}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {# Botón de cerrar (la X) #}
                 </div>
-                <form id="createDirForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="createDirPath" class="form-label">En directorio:</label>
-                            <input type="text" class="form-control" id="createDirPath" readonly>
+                <form id="createDirForm"> {# Formulario para enviar datos al backend #}
+                    <div class="modal-body"> {# Cuerpo principal del formulario #}
+                        <div class="mb-3"> {# Grupo de formulario con margen inferior #}
+                            <label for="createDirPath" class="form-label">En directorio:</label> {# Etiqueta del campo #}
+                            <input type="text" class="form-control" id="createDirPath" readonly> {# Campo de texto para mostrar la ruta padre (solo lectura) #}
                         </div>
-                        <div class="mb-3">
-                            <label for="createDirName" class="form-label">Nombre de la nueva carpeta:</label>
-                            <input type="text" class="form-control" id="createDirName" required>
+                        <div class="mb-3"> {# Otro grupo de formulario #}
+                            <label for="createDirName" class="form-label">Nombre de la nueva carpeta:</label> {# Etiqueta #}
+                            <input type="text" class="form-control" id="createDirName" required> {# Campo para el nombre, es requerido #}
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Crear</button>
+                    <div class="modal-footer"> {# Pie del modal (para los botones) #}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> {# Botón para cancelar (cierra el modal) #}
+                        <button type="submit" class="btn btn-primary">Crear</button> {# Botón para enviar el formulario (crear la carpeta) #}
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
+    {# Modal para Crear Archivo #}
+    <div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true"> {# Similar al modal de Crear Carpeta #}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createFileModalLabel"><i class="bi bi-file-earmark-plus me-2"></i>Crear Archivo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="createFileModalLabel"><i class="bi bi-file-earmark-plus me-2"></i>Crear Archivo</h5> {# Título con icono #}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {# Botón de cerrar #}
                 </div>
-                <form id="createFileForm">
-                    <div class="modal-body">
-                         <div class="mb-3">
+                <form id="createFileForm"> {# Formulario para crear archivo #}
+                    <div class="modal-body"> {# Cuerpo del formulario #}
+                         <div class="mb-3"> {# Grupo para la ruta padre #}
                             <label for="createFilePath" class="form-label">En directorio:</label>
-                            <input type="text" class="form-control" id="createFilePath" readonly>
+                            <input type="text" class="form-control" id="createFilePath" readonly> {# Ruta padre (solo lectura) #}
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3"> {# Grupo para el nombre del archivo #}
                             <label for="createFileName" class="form-label">Nombre del nuevo archivo:</label>
-                            <input type="text" class="form-control" id="createFileName" required>
+                            <input type="text" class="form-control" id="createFileName" required> {# Nombre del archivo (requerido) #}
                         </div>
-                        <div class="mb-3">
-                            <label for="createFileContent" class="form-label">Contenido inicial (Opcional):</label>
-                            <textarea class="form-control" id="createFileContent" rows="5"></textarea>
+                        <div class="mb-3"> {# Grupo para el contenido inicial #}
+                            <label for="createFileContent" class="form-label">Contenido inicial (Opcional):</label> {# Etiqueta #}
+                            <textarea class="form-control" id="createFileContent" rows="5"></textarea> {# Área de texto para el contenido #}
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Crear</button>
+                    <div class="modal-footer"> {# Pie del modal #}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> {# Cancelar #}
+                        <button type="submit" class="btn btn-primary">Crear</button> {# Crear #}
                     </div>
-                    </div>
+                    </div> {# Parece que hay un cierre de div extra aquí, revisar estructura HTML final #}
                 </form>
             </div>
         </div>
     </div>
 
-     <div class="modal fade" id="appendModal" tabindex="-1" aria-labelledby="appendModalLabel" aria-hidden="true">
+     {# Modal para Agregar Contenido a un archivo #}
+     <div class="modal fade" id="appendModal" tabindex="-1" aria-labelledby="appendModalLabel" aria-hidden="true"> {# Similar a otros modales #}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="appendModalLabel"><i class="bi bi-file-earmark-text me-2"></i>Agregar Contenido</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="appendModalLabel"><i class="bi bi-file-earmark-text me-2"></i>Agregar Contenido</h5> {# Título con icono de archivo/texto #}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {# Botón de cerrar #}
                 </div>
-                <form id="appendFileForm">
-                    <div class="modal-body">
-                         <div class="mb-3">
+                <form id="appendFileForm"> {# Formulario para agregar contenido #}
+                    <div class="modal-body"> {# Cuerpo del formulario #}
+                         <div class="mb-3"> {# Grupo para la ruta del archivo #}
                             <label for="appendFilePath" class="form-label">A archivo:</label>
-                            <input type="text" class="form-control" id="appendFilePath" readonly>
+                            <input type="text" class="form-control" id="appendFilePath" readonly> {# Ruta del archivo (solo lectura) #}
                         </div>
-                         <div class="mb-3">
+                         <div class="mb-3"> {# Grupo para previsualizar contenido actual (opcional, mejora UX) #}
                             <label for="appendFileContentPreview" class="form-label">Contenido actual:</label>
-                            <textarea class="form-control" id="appendFileContentPreview" rows="5" readonly></textarea>
+                            <textarea class="form-control" id="appendFileContentPreview" rows="5" readonly></textarea> {# Área de texto para previsualizar (solo lectura) #}
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3"> {# Grupo para el contenido a añadir #}
                             <label for="appendFileContent" class="form-label">Contenido a agregar:</label>
-                            <textarea class="form-control" id="appendFileContent" rows="3" required></textarea>
+                            <textarea class="form-control" id="appendFileContent" rows="3" required></textarea> {# Área de texto para el nuevo contenido (requerido) #}
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    <div class="modal-footer"> {# Pie del modal #}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> {# Cancelar #}
+                        <button type="submit" class="btn btn-primary">Agregar</button> {# Agregar #}
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    {# Modal para Eliminar Item #}
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"> {# Similar a otros modales #}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel"><i class="bi bi-trash me-2"></i>Eliminar Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="deleteModalLabel"><i class="bi bi-trash me-2"></i>Eliminar Item</h5> {# Título con icono de papelera #}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {# Botón de cerrar #}
                 </div>
-                <form id="deleteItemForm">
-                    <div class="modal-body">
-                        <input type="hidden" id="deleteItemPath" name="path">
-                        <p>¿Estás seguro de que quieres eliminar <strong id="deleteItemNameDisplay">este item</strong>? Esta acción no se puede deshacer.</p>
-                         <div class="alert alert-warning mt-3 small">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            Advertencia: Eliminar un directorio borrará todo su contenido de forma recursiva.
+                <form id="deleteItemForm"> {# Formulario de eliminación (aunque solo es un botón, se usa form para consistencia y submit event) #}
+                    <div class="modal-body"> {# Cuerpo del modal #}
+                        <input type="hidden" id="deleteItemPath" name="path"> {# Campo oculto para guardar la ruta del elemento a borrar #}
+                        <p>¿Estás seguro de que quieres eliminar <strong id="deleteItemNameDisplay">este item</strong>? Esta acción no se puede deshacer.</p> {# Mensaje de confirmación. El texto del strong se actualiza con JS para mostrar el nombre del item. #}
+                         <div class="alert alert-warning mt-3 small"> {# Un mensaje de advertencia de Bootstrap #}
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> {# Icono de advertencia #}
+                            Advertencia: Eliminar un directorio borrará todo su contenido de forma recursiva. {# Texto de advertencia #}
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <div class="modal-footer"> {# Pie del modal #}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> {# Cancelar #}
+                        <button type="submit" class="btn btn-danger">Eliminar</button> {# Botón de eliminar (color peligro) #}
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-     <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+     {# Modal para Renombrar Item #}
+     <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true"> {# Similar a otros modales #}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="renameModalLabel"><i class="bi bi-pencil me-2"></i>Renombrar Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="renameModalLabel"><i class="bi bi-pencil me-2"></i>Renombrar Item</h5> {# Título con icono de lápiz #}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {# Botón de cerrar #}
                 </div>
-                <form id="renameItemForm">
-                    <div class="modal-body">
-                        <input type="hidden" id="renameItemPath" name="oldPath">
-                        <div class="mb-3">
-                            <label for="renameItemName" class="form-label">Nuevo nombre:</label>
-                            <input type="text" class="form-control" id="renameItemName" required>
+                <form id="renameItemForm"> {# Formulario para renombrar #}
+                    <div class="modal-body"> {# Cuerpo del formulario #}
+                        <input type="hidden" id="renameItemPath" name="oldPath"> {# Campo oculto para guardar la ruta antigua #}
+                        <div class="mb-3"> {# Grupo para el nuevo nombre #}
+                            <label for="renameItemName" class="form-label">Nuevo nombre:</label> {# Etiqueta #}
+                            <input type="text" class="form-control" id="renameItemName" required> {# Campo para el nuevo nombre (requerido) #}
                         </div>
-                         <div class="alert alert-info mt-3 small">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            Solo se permite renombrar dentro del mismo directorio.
+                         <div class="alert alert-info mt-3 small"> {# Un mensaje informativo de Bootstrap #}
+                            <i class="bi bi-info-circle-fill me-2"></i> {# Icono de información #}
+                            Solo se permite renombrar dentro del mismo directorio. {# Texto informativo #}
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Renombrar</button>
+                    <div class="modal-footer"> {# Pie del modal #}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> {# Cancelar #}
+                        <button type="submit" class="btn btn-primary">Renombrar</button> {# Renombrar #}
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-fullscreen-lg-down"> {# Added fullscreen for large screens and down #}
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="previewModalLabel"><i class="bi bi-file-earmark-text me-2"></i>Previsualización: <span id="previewModalFileName"></span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    {# Modal para Previsualización Maximizada #}
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true"> {# Similar a otros modales #}
+        <div class="modal-dialog modal-xl modal-fullscreen-lg-down"> {# Diálogo del modal. modal-xl para tamaño extra grande en pantallas grandes. modal-fullscreen-lg-down para que sea pantalla completa en pantallas grandes (lg) y hacia abajo. #}
+            <div class="modal-content"> {# Contenido del modal #}
+                <div class="modal-header"> {# Cabecera #}
+                    <h5 class="modal-title" id="previewModalLabel"><i class="bi bi-file-earmark-text me-2"></i>Previsualización: <span id="previewModalFileName"></span></h5> {# Título con icono y un span con ID para el nombre del archivo (actualizado con JS) #}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {# Botón de cerrar #}
                 </div>
-                <div class="modal-body d-flex flex-column">
-                     <div class="mb-2">
-                        <small class="text-muted">Ruta: <span id="previewModalFilePath"></span></small>
+                <div class="modal-body d-flex flex-column"> {# Cuerpo del modal, usando flexbox en columna #}
+                     <div class="mb-2"> {# Div para la ruta, con margen inferior #}
+                        <small class="text-muted">Ruta: <span id="previewModalFilePath"></span></small> {# Texto "Ruta:" con la ruta del archivo en un span con ID (actualizado con JS) #}
                     </div>
-                    <pre id="previewModalFileContent" class="bg-light p-3 rounded-3 overflow-auto flex-grow-1">Cargando contenido...</pre>
+                    <pre id="previewModalFileContent" class="bg-light p-3 rounded-3 overflow-auto flex-grow-1">Cargando contenido...</pre> {# Área para mostrar el contenido del archivo. Usa <pre> para formato, con ID, clases de Bootstrap y custom para scrollbar, crece para llenar espacio. Texto inicial de carga. #}
                 </div>
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                 <div class="modal-footer"> {# Pie del modal #}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button> {# Botón para cerrar el modal #}
                 </div>
             </div>
         </div>
     </div>
 
 
-    {# Scripts - Keep them at the end of the body #}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {# --- Scripts ---
+       Es buena práctica incluir los scripts al final del <body>.
+       Así el navegador carga primero el HTML y CSS, y la página se muestra antes de que los scripts se ejecuten. #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> {# El bundle de JavaScript de Bootstrap, incluye Popper.js necesario para modales, dropdowns, etc. #}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script> {# Nuestro archivo JavaScript principal. url_for genera la URL correcta. #}
 </body>
 </html>
