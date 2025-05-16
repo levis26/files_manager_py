@@ -200,12 +200,53 @@ function addUpdateButtonHandler() {
     }
 }
 
-// Initialize the update button handler when the page loads
+// Initialize the update button handler
+function initializeUpdateButton() {
+    const updateButton = document.getElementById('updateButton');
+    if (updateButton) {
+        updateButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                // Get the current path from the displayed element
+                const currentPathDisplay = document.getElementById('currentPath');
+                if (!currentPathDisplay) {
+                    console.error('No se puede encontrar el elemento de la ruta actual');
+                    showAlert('danger', 'Error', 'No se puede encontrar el elemento de la ruta actual');
+                    return;
+                }
+                
+                // Get the current path (excluding "data/" prefix)
+                const currentPath = currentPathDisplay.textContent.replace('Estás en: ', '').trim();
+                
+                // Load the directory content again
+                await loadDirectoryContent(currentPath);
+                showAlert('success', 'Contenido actualizado', 'El directorio se ha actualizado correctamente');
+            } catch (error) {
+                console.error('Error al actualizar:', error);
+                showAlert('danger', 'Error', 'No se pudo actualizar el contenido. Por favor, intenta nuevamente.');
+            }
+        });
+    } else {
+        console.error("Button with ID 'updateButton' not found.");
+    }
+}
+
+// Initialize all event handlers when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Add a small delay to ensure all elements are properly loaded
-    setTimeout(() => {
-        addUpdateButtonHandler();
-    }, 100);
+    // Initialize update button handler
+    initializeUpdateButton();
+
+    // Initialize form handlers for create directory and file
+    const createDirForm = document.getElementById('createDirForm');
+    const createFileForm = document.getElementById('createFileForm');
+    
+    if (createDirForm) {
+        createDirForm.addEventListener('submit', handleCreateFormSubmit);
+    }
+    
+    if (createFileForm) {
+        createFileForm.addEventListener('submit', handleCreateFormSubmit);
+    }
 });
 
 
