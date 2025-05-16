@@ -164,6 +164,42 @@ function clearSelection(event) {
     }
 }
 
+// Add click handler for the update button
+function addUpdateButtonHandler() {
+    const updateButton = document.querySelector('.btn-outline-primary');
+    if (updateButton) {
+        updateButton.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent any default behavior
+            
+            // Get the current path from the display element
+            const currentPathDisplay = document.getElementById('currentPath');
+            if (!currentPathDisplay) {
+                showAlert('danger', 'Error', 'No se puede encontrar el elemento de la ruta actual');
+                return;
+            }
+            
+            const currentPath = currentPathDisplay.textContent.replace('Estás en: ', '').trim();
+            
+            try {
+                // Load the directory content again
+                await loadDirectoryContent(currentPath);
+                showAlert('success', 'Contenido actualizado', 'El directorio se ha actualizado correctamente');
+            } catch (error) {
+                console.error('Error al actualizar:', error);
+                showAlert('danger', 'Error al actualizar', 'No se pudo actualizar el contenido. Por favor, intenta nuevamente.');
+            }
+        });
+    }
+}
+
+// Initialize the update button handler when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Add a small delay to ensure all elements are properly loaded
+    setTimeout(() => {
+        addUpdateButtonHandler();
+    }, 100);
+});
+
 
 // Function to load directory content from the backend API
 async function loadDirectoryContent(path = '') {
