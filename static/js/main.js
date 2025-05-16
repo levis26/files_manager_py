@@ -164,31 +164,39 @@ function clearSelection(event) {
     }
 }
 
-// Add click handler for the update button
+// Function to add click handler for the update button
 function addUpdateButtonHandler() {
-    const updateButton = document.querySelector('.btn-outline-primary');
+    // Assuming ID added as proposed earlier for robust selection
+    const updateButton = document.getElementById('updateButton');
     if (updateButton) {
         updateButton.addEventListener('click', async (e) => {
             e.preventDefault(); // Prevent any default behavior
-            
-            // Get the current path from the display element
-            const currentPathDisplay = document.getElementById('currentPath');
-            if (!currentPathDisplay) {
-                showAlert('danger', 'Error', 'No se puede encontrar el elemento de la ruta actual');
-                return;
-            }
-            
-            const currentPath = currentPathDisplay.textContent.replace('Estás en: ', '').trim();
-            
+
+            // Modificación clave: Llamar loadDirectoryContent con una cadena vacía
+            // para cargar el contenido del directorio raíz ('data/').
+            const rootPath = ''; // Representa el directorio raíz relativo a DATA_DIR
+
             try {
-                // Load the directory content again
-                await loadDirectoryContent(currentPath);
-                showAlert('success', 'Contenido actualizado', 'El directorio se ha actualizado correctamente');
+                // Cargar el contenido del directorio raíz
+                await loadDirectoryContent(rootPath);
+                // Actualizar el mensaje de éxito para reflejar que se ha vuelto a la raíz
+                showAlert('success', 'Explorador actualizado', 'Se ha vuelto a la raíz principal.');
+                 // Opcional: Limpiar la barra de búsqueda al volver a la raíz
+                 const searchInput = document.getElementById('searchInput');
+                 if(searchInput) {
+                     searchInput.value = '';
+                 }
+                 // Opcional: Limpiar cualquier resultado de búsqueda si se mostraba
+                 // La función loadDirectoryContent ya maneja esto al borrar el contenido anterior del navegador.
+
             } catch (error) {
-                console.error('Error al actualizar:', error);
-                showAlert('danger', 'Error al actualizar', 'No se pudo actualizar el contenido. Por favor, intenta nuevamente.');
+                console.error('Error al volver a la raíz:', error);
+                showAlert('danger', 'Error al actualizar', 'No se pudo volver a la raíz principal. Por favor, intenta nuevamente.');
             }
         });
+    } else {
+        // Log an error if the button element is not found (useful for debugging)
+        console.error("Button with ID 'updateButton' not found.");
     }
 }
 
